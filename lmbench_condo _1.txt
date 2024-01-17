@@ -1,0 +1,207 @@
+Simple syscall: 3.5558 microseconds                                             
+Simple read: 1.9475 microseconds                                                
+Simple write: 1.5935 microseconds                                               
+Simple stat: 11.6681 microseconds                                               
+Simple fstat: 4.1309 microseconds                                               
+Simple open/close: 19.3021 microseconds                                         
+Select on 10 fd's: 2.0512 microseconds                                          
+Select on 100 fd's: 7.3143 microseconds                                         
+Select on 250 fd's: 15.9740 microseconds                                        
+Select on 500 fd's: 30.5525 microseconds                                        
+Select on 10 tcp fd's: 2.2603 microseconds                                      
+Select on 100 tcp fd's: 16.8024 microseconds                                    
+Select on 250 tcp fd's: 41.1045 microseconds                                    
+Select on 500 tcp fd's: 83.0781 microseconds                                    
+Signal handler installation: 2.2057 microseconds                                
+Signal handler overhead: 6.2776 microseconds
+Protection fault: 0.9492 microseconds                                           
+Pipe latency: 18.4936 microseconds                                              
+AF_UNIX sock stream latency: 37.2222 microseconds                               
+Process fork+exit: 401.1429 microseconds                                        
+Process fork+execve: 447.2500 microseconds
+Process fork+/bin/sh -c: 2221.0000 microseconds                                 
+integer bit: 0.45 nanoseconds                                                   
+integer add: 0.67 nanoseconds                                                   
+integer mul: 2.03 nanoseconds                                                   
+integer div: 4.01 nanoseconds 
+integer mod: 4.23 nanoseconds                                                   
+int64 bit: 0.45 nanoseconds                                                     
+uint64 add: 0.67 nanoseconds                                                    
+int64 mul: 2.70 nanoseconds                                                     
+int64 div: 6.35 nanoseconds                                                     
+int64 mod: 4.90 nanoseconds                                                     
+float add: 2.68 nanoseconds                                                     
+float mul: 2.67 nanoseconds                                                     
+float div: 8.69 nanoseconds                                                     
+double add: 2.67 nanoseconds                                                    
+double mul: 2.67 nanoseconds                                                    
+double div: 14.70 nanoseconds                                                   
+float bogomflops: 16.11 nanoseconds                                             
+double bogomflops: 22.12 nanoseconds                                            
+integer bit parallelism: 2.54                                                   
+integer add parallelism: 1.74                                                   
+integer mul parallelism: 2.94                                                   
+integer div parallelism: 1.00                                                   
+integer mod parallelism: 1.16                                                   
+int64 bit parallelism: 1.30                                                     
+int64 add parallelism: 1.74                                                     
+int64 mul parallelism: 1.99                                                     
+int64 div parallelism: 1.00 
+int64 mod parallelism: 1.19                                                     
+float add parallelism: 7.76                                                     
+float mul parallelism: 1.99                                                     
+float div parallelism: 1.30                                                     
+double add parallelism: 7.76                                                    
+double mul parallelism: 1.99                                                    
+double div parallelism: 1.16                                                    
+File /root/s/XXX write bandwidth: 46398 KB/sec                                  
+Pagefaults on /root/s/XXX: 1.0861 microseconds                                  
+                                                                                
+"mappings                                                                       
+0.524288 31                                                                     
+1.048576 37                                                                     
+2.097152 64                                                                     
+4.194304 108                                                                    
+8.388608 220                                                                    
+16.777216 397                                                                   
+33.554432 751                                                                   
+67.108864 1477                                                                  
+134.217728 2930                                                                 
+268.435456 6015                                                                 
+536.870912 12984
+
+"File system latency                                                            
+0k      49      8312    14969                                                   
+1k      38      7156    13018                                                   
+4k      38      6936    12837                                                   
+10k     34      5918    11458                                                   
+                                                                                
+Cannot register service: RPC: Unable to receive; errno = Connection refused     
+unable to register (XACT_PROG, XACT_VERS, udp).                                 
+UDP latency using localhost: 54.7711 microseconds                               
+TCP latency using localhost: 67.0742 microseconds                               
+localhost: RPC: Port mapper failure - RPC: Unable to receive                    
+localhost: RPC: Remote system error - Connection refused                        
+: RPC: Port mapper failure - RPC: Unable to receive                             
+TCP/IP connection cost to localhost: 138.5000 microseconds                      
+                                                                                
+Socket bandwidth using localhost                                                
+0.000001 0.32 MB/sec                                                            
+0.000064 20.14 MB/sec                                                           
+0.000128 39.20 MB/sec                                                           
+0.000256 76.88 MB/sec                                                           
+0.000512 146.53 MB/sec                                                          
+0.001024 268.77 MB/sec                                                          
+0.001437 355.28 MB/sec
+10.000000 1175.36 MB/sec                                                        
+                                                                                
+Avg xfer: 3.2KB, 41.8KB in 4.5700 millisecs, 9.14 MB/sec                        
+AF_UNIX sock stream bandwidth: 2627.11 MB/sec                                   
+Pipe bandwidth: 1059.50 MB/sec                                                  
+                                                                                
+"read bandwidth                                                                 
+0.000512 94.63                                                                  
+0.001024 181.62                                                                 
+0.002048 342.01                                                                 
+0.004096 616.51                                                                 
+0.008192 946.64                                                                 
+0.016384 1285.89                                                                
+0.032768 1631.50                                                                
+0.065536 1910.22                                                                
+0.131072 1961.94                                                                
+0.262144 1975.58                                                                
+0.524288 1962.58                                                                
+1.05 1684.01                                                                    
+2.10 1261.44                                                                    
+4.19 1225.51                                                                    
+8.39 1226.58                                                                    
+16.78 1232.53
+33.55 1232.26                                                                   
+67.11 1232.89                                                                   
+134.22 1218.04                                                                  
+268.44 1232.17                                                                  
+536.87 1235.68                                                                  
+                                                                                
+"read open2close bandwidth                                                      
+0.000512 20.62                                                                  
+0.001024 39.71                                                                  
+0.002048 81.41                                                                  
+0.004096 154.52                                                                 
+0.008192 279.92                                                                 
+0.016384 514.43                                                                 
+0.032768 809.23                                                                 
+0.065536 1216.45                                                                
+0.131072 1506.57                                                                
+0.262144 1706.60                                                                
+0.524288 1792.92                                                                
+1.05 1550.86                                                                    
+2.10 1197.52                                                                    
+4.19 1199.23                                                                    
+8.39 1212.58                                                                    
+16.78 1225.33
+33.55 1228.79                                                                   
+67.11 1229.03                                                                   
+134.22 1234.53                                                                  
+268.44 1231.38                                                                  
+536.87 1235.50                                                                  
+                                                                                
+                                                                                
+"Mmap read bandwidth                                                            
+0.000512 4899.27                                                                
+0.001024 5599.59                                                                
+0.002048 5763.68                                                                
+0.004096 5843.15                                                                
+0.008192 5887.26                                                                
+0.016384 5892.28                                                                
+0.032768 5514.04                                                                
+0.065536 5535.70                                                                
+0.131072 5679.23                                                                
+0.262144 5662.88                                                                
+0.524288 5644.59                                                                
+1.05 4554.72                                                                    
+2.10 2377.72                                                                    
+4.19 2255.41                                                                    
+8.39 2249.56
+16.78 2237.26                                                                   
+33.55 2087.76                                                                   
+67.11 1985.53                                                                   
+134.22 2001.67                                                                  
+268.44 2042.59                                                                  
+536.87 2025.44                                                                  
+                                                                                
+"Mmap read open2close bandwidth                                                 
+0.000512 14.28                                                                  
+0.001024 28.21                                                                  
+0.002048 55.00                                                                  
+0.004096 108.51                                                                 
+0.008192 215.06                                                                 
+0.016384 385.75                                                                 
+0.032768 670.32                                                                 
+0.065536 1064.39                                                                
+0.131072 1469.26                                                                
+0.262144 1916.53                                                                
+0.524288 2191.76                                                                
+1.05 1970.00                                                                    
+2.10 1446.06                                                                    
+4.19 1384.72                                                                    
+8.39 1376.76
+...
+
+STREAM copy latency: 3.78 nanoseconds                                           
+STREAM copy bandwidth: 4233.43 MB/sec                                           
+STREAM scale latency: 5.78 nanoseconds                                          
+STREAM scale bandwidth: 2765.83 MB/sec                                          
+STREAM add latency: 9.99 nanoseconds                                            
+STREAM add bandwidth: 2402.38 MB/sec                                            
+STREAM triad latency: 11.77 nanoseconds                                         
+STREAM triad bandwidth: 2039.30 MB/sec                                          
+STREAM2 fill latency: 2.01 nanoseconds                                          
+STREAM2 fill bandwidth: 3988.28 MB/sec                                          
+STREAM2 copy latency: 3.76 nanoseconds                                          
+STREAM2 copy bandwidth: 4249.99 MB/sec                                          
+STREAM2 daxpy latency: 12.71 nanoseconds                                        
+STREAM2 daxpy bandwidth: 1887.74 MB/sec                                         
+STREAM2 sum latency: 3.83 nanoseconds                                           
+STREAM2 sum bandwidth: 2087.72 MB/sec
+
+

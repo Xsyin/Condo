@@ -1,0 +1,192 @@
+Simple syscall: 3.4900 microseconds
+Simple read: 1.9482 microseconds
+Simple write: 1.5867 microseconds
+Simple stat: 10.1342 microseconds
+Simple fstat: 4.1678 microseconds
+Simple open/close: 18.4898 microseconds
+Select on 10 fd's: 2.0619 microseconds
+Select on 100 fd's: 7.3117 microseconds
+Select on 250 fd's: 15.9452 microseconds
+Select on 500 fd's: 30.5193 microseconds
+Select on 10 tcp fd's: 2.2583 microseconds
+Select on 100 tcp fd's: 17.0492 microseconds
+Select on 250 tcp fd's: 41.7143 microseconds
+Select on 500 tcp fd's: 81.6912 microseconds
+Signal handler installation: 2.1880 microseconds
+Signal handler overhead: 6.3173 microseconds
+Protection fault: 1.0486 microseconds
+Pipe latency: 18.6456 microseconds
+AF_UNIX sock stream latency: 37.4138 microseconds
+Process fork+exit: 394.0000 microseconds
+Process fork+execve: 448.0000 microseconds
+Process fork+/bin/sh -c: 2255.0000 microseconds
+integer bit: 0.45 nanoseconds
+integer add: 0.67 nanoseconds
+integer mul: 2.03 nanoseconds
+integer div: 4.01 nanoseconds
+integer mod: 4.24 nanoseconds
+int64 bit: 0.45 nanoseconds
+uint64 add: 0.67 nanoseconds
+int64 mul: 2.70 nanoseconds
+int64 div: 6.36 nanoseconds
+int64 mod: 4.90 nanoseconds
+float add: 2.67 nanoseconds
+float mul: 2.67 nanoseconds
+float div: 8.69 nanoseconds
+double add: 2.67 nanoseconds
+double mul: 2.68 nanoseconds
+double div: 14.71 nanoseconds
+float bogomflops: 16.12 nanoseconds
+double bogomflops: 22.16 nanoseconds
+integer bit parallelism: 2.54
+integer add parallelism: 1.74
+integer mul parallelism: 2.94
+integer div parallelism: 1.00
+integer mod parallelism: 1.16
+int64 bit parallelism: 1.30
+int64 add parallelism: 1.74
+int64 mul parallelism: 1.99
+int64 div parallelism: 1.00
+int64 mod parallelism: 1.19
+float add parallelism: 7.76
+float mul parallelism: 1.99
+float div parallelism: 1.30
+double add parallelism: 7.77
+double mul parallelism: 1.99
+double div parallelism: 1.16
+File /root/XXX write bandwidth: 23276 KB/sec
+Pagefaults on /root/XXX: 1.2720 microseconds
+
+"mappings
+0.524288 27
+1.048576 37
+2.097152 65
+4.194304 110
+8.388608 200
+16.777216 402
+33.554432 754
+67.108864 1488
+134.217728 2988
+268.435456 5964
+536.870912 12439
+1073.741824 26739
+
+"File system latency
+0k      44      8275    15262
+1k      41      7021    13281
+4k      41      7211    13090
+10k     35      6094    11694
+
+Cannot register service: RPC: Unable to receive; errno = Connection refused
+unable to register (XACT_PROG, XACT_VERS, udp).
+UDP latency using localhost: 57.6756 microseconds
+TCP latency using localhost: 68.5931 microseconds
+localhost: RPC: Port mapper failure - RPC: Unable to receive
+localhost: RPC: Remote system error - Connection refused
+: RPC: Port mapper failure - RPC: Unable to receive
+TCP/IP connection cost to localhost: 98.1754 microseconds
+
+Socket bandwidth using localhost
+0.000001 0.32 MB/sec
+0.000064 19.96 MB/sec
+0.000128 39.30 MB/sec
+0.000256 77.91 MB/sec
+0.000512 148.34 MB/sec
+0.001024 274.39 MB/sec
+0.001437 355.23 MB/sec
+10.000000 1173.02 MB/sec
+
+Avg xfer: 3.2KB, 41.8KB in 4.5980 millisecs, 9.08 MB/sec
+AF_UNIX sock stream bandwidth: 2618.04 MB/sec
+Pipe bandwidth: 1058.38 MB/sec
+
+"read bandwidth
+0.000512 93.71
+0.001024 180.83
+0.002048 344.49
+0.004096 616.55
+0.008192 955.04
+0.016384 1291.76
+0.032768 1607.62
+0.065536 1880.28
+0.131072 1924.85
+0.262144 1948.05
+0.524288 1932.94
+1.05 1663.42
+2.10 1237.08
+4.19 1197.18
+8.39 1193.77
+16.78 1195.98
+33.55 1198.29
+67.11 1197.45
+134.22 1195.92
+268.44 1196.66
+536.87 1197.92
+1073.74 1199.78
+
+"read open2close bandwidth
+0.000512 21.81
+0.001024 43.54
+0.002048 85.41
+0.004096 161.99
+0.008192 301.24
+0.016384 524.60
+0.032768 832.93
+0.065536 1209.54
+0.131072 1504.14
+0.262144 1700.90
+0.524288 1792.60
+1.05 1526.59
+2.10 1183.33
+4.19 1169.47
+8.39 1165.25
+16.78 1186.51
+33.55 1175.53
+67.11 1194.41
+134.22 1179.45
+268.44 1197.63
+536.87 1183.19
+1073.74 1197.56
+
+
+"Mmap read bandwidth
+0.000512 4885.82
+0.001024 5591.84
+0.002048 5760.54
+0.004096 5849.52
+0.008192 5889.39
+0.016384 5888.00
+0.032768 5869.96
+0.065536 5396.11
+0.131072 5671.96
+0.262144 5661.75
+0.524288 5642.56
+1.05 4614.86
+2.10 2392.19
+4.19 2255.00
+8.39 2237.26
+16.78 1919.37
+33.55 2234.43
+67.11 1996.04
+134.22 2103.73
+268.44 2012.31
+536.87 2056.28
+1073.74 2040.92
+
+
+STREAM copy latency: 3.83 nanoseconds
+STREAM copy bandwidth: 4175.27 MB/sec
+STREAM scale latency: 5.88 nanoseconds
+STREAM scale bandwidth: 2720.21 MB/sec
+STREAM add latency: 10.50 nanoseconds
+STREAM add bandwidth: 2285.23 MB/sec
+STREAM triad latency: 12.48 nanoseconds
+STREAM triad bandwidth: 1922.56 MB/sec
+STREAM2 fill latency: 2.01 nanoseconds
+STREAM2 fill bandwidth: 3980.74 MB/sec
+STREAM2 copy latency: 3.81 nanoseconds
+STREAM2 copy bandwidth: 4198.43 MB/sec
+STREAM2 daxpy latency: 13.48 nanoseconds
+STREAM2 daxpy bandwidth: 1780.91 MB/sec
+STREAM2 sum latency: 3.93 nanoseconds
+STREAM2 sum bandwidth: 2036.54 MB/sec

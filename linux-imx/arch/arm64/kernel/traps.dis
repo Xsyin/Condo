@@ -1,0 +1,2252 @@
+
+traps.o:     file format elf64-littleaarch64
+
+
+Disassembly of section .text:
+
+0000000000000000 <arm64_skip_faulting_instruction.part.1>:
+	} else {
+		die(str, regs, err);
+	}
+}
+
+void arm64_skip_faulting_instruction(struct pt_regs *regs, unsigned long size)
+       0:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+ */
+static __always_inline struct task_struct *get_current(void)
+{
+	unsigned long sp_el0;
+
+	asm ("mrs %0, sp_el0" : "=r" (sp_el0));
+       4:	d5384100 	mrs	x0, sp_el0
+       8:	910003fd 	mov	x29, sp
+	/*
+	 * If we were single stepping, we want to get the step exception after
+	 * we return from the trap.
+	 */
+	if (user_mode(regs))
+		user_fastforward_single_step(current);
+       c:	94000000 	bl	0 <user_fastforward_single_step>
+}
+      10:	a8c17bfd 	ldp	x29, x30, [sp], #16
+      14:	d65f03c0 	ret
+
+0000000000000018 <cntfrq_read_handler>:
+	pt_regs_write_reg(regs, rt, arch_counter_get_cntvct());
+	arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
+}
+
+static void cntfrq_read_handler(unsigned int esr, struct pt_regs *regs)
+{
+      18:	a9be7bfd 	stp	x29, x30, [sp, #-32]!
+      1c:	910003fd 	mov	x29, sp
+      20:	a90153f3 	stp	x19, x20, [sp, #16]
+	int rt = (esr & ESR_ELx_SYS64_ISS_RT_MASK) >> ESR_ELx_SYS64_ISS_RT_SHIFT;
+      24:	53052414 	ubfx	w20, w0, #5, #5
+{
+      28:	aa0103f3 	mov	x19, x1
+
+	pt_regs_write_reg(regs, rt, arch_timer_get_rate());
+      2c:	94000000 	bl	0 <arch_timer_get_rate>
+ * This handles the common case where 31 means XZR, not SP.
+ */
+static inline void pt_regs_write_reg(struct pt_regs *regs, int r,
+				     unsigned long val)
+{
+	if (r != 31)
+      30:	71007e9f 	cmp	w20, #0x1f
+      34:	54000060 	b.eq	40 <cntfrq_read_handler+0x28>  // b.none
+      38:	2a0003e0 	mov	w0, w0
+      3c:	f834da60 	str	x0, [x19, w20, sxtw #3]
+	if (user_mode(regs))
+      40:	a9500660 	ldp	x0, x1, [x19, #256]
+	regs->pc += size;
+      44:	91001000 	add	x0, x0, #0x4
+      48:	f9008260 	str	x0, [x19, #256]
+	if (user_mode(regs))
+      4c:	f2400c3f 	tst	x1, #0xf
+      50:	54000080 	b.eq	60 <cntfrq_read_handler+0x48>  // b.none
+	arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
+}
+      54:	a94153f3 	ldp	x19, x20, [sp, #16]
+      58:	a8c27bfd 	ldp	x29, x30, [sp], #32
+      5c:	d65f03c0 	ret
+      60:	97ffffe8 	bl	0 <arm64_skip_faulting_instruction.part.1>
+      64:	a94153f3 	ldp	x19, x20, [sp, #16]
+      68:	a8c27bfd 	ldp	x29, x30, [sp], #32
+      6c:	d65f03c0 	ret
+
+0000000000000070 <cntvct_read_handler>:
+{
+      70:	a9bd7bfd 	stp	x29, x30, [sp, #-48]!
+      74:	910003fd 	mov	x29, sp
+      78:	a90153f3 	stp	x19, x20, [sp, #16]
+      7c:	aa0103f3 	mov	x19, x1
+	int rt = (esr & ESR_ELx_SYS64_ISS_RT_MASK) >> ESR_ELx_SYS64_ISS_RT_SHIFT;
+      80:	53052414 	ubfx	w20, w0, #5, #5
+	return arch_timer_reg_read_stable(cntpct_el0);
+}
+
+static inline u64 arch_counter_get_cntvct(void)
+{
+	isb();
+      84:	d5033fdf 	isb
+
+#define JUMP_LABEL_NOP_SIZE		AARCH64_INSN_SIZE
+
+static __always_inline bool arch_static_branch(struct static_key *key, bool branch)
+{
+	asm_volatile_goto("1: nop\n\t"
+      88:	d503201f 	nop
+	return arch_timer_reg_read_stable(cntvct_el0);
+      8c:	d53be040 	mrs	x0, cntvct_el0
+      90:	71007e9f 	cmp	w20, #0x1f
+      94:	54000040 	b.eq	9c <cntvct_read_handler+0x2c>  // b.none
+		regs->regs[r] = val;
+      98:	f834da60 	str	x0, [x19, w20, sxtw #3]
+	if (user_mode(regs))
+      9c:	a9500660 	ldp	x0, x1, [x19, #256]
+	regs->pc += size;
+      a0:	91001000 	add	x0, x0, #0x4
+      a4:	f9008260 	str	x0, [x19, #256]
+	if (user_mode(regs))
+      a8:	f2400c3f 	tst	x1, #0xf
+      ac:	54000380 	b.eq	11c <cntvct_read_handler+0xac>  // b.none
+}
+      b0:	a94153f3 	ldp	x19, x20, [sp, #16]
+      b4:	a8c37bfd 	ldp	x29, x30, [sp], #48
+      b8:	d65f03c0 	ret
+      bc:	d5384101 	mrs	x1, sp_el0
+ * The various preempt_count add/sub methods
+ */
+
+static __always_inline void __preempt_count_add(int val)
+{
+	*preempt_count_ptr() += val;
+      c0:	b9401020 	ldr	w0, [x1, #16]
+      c4:	11000400 	add	w0, w0, #0x1
+      c8:	b9001020 	str	w0, [x1, #16]
+      cc:	90000000 	adrp	x0, 0 <timer_unstable_counter_workaround>
+      d0:	91000000 	add	x0, x0, #0x0
+
+	/*
+	 * We want to allow caching the value, so avoid using volatile and
+	 * instead use a fake stack read to hazard against barrier().
+	 */
+	asm(ALTERNATIVE("mrs %0, tpidr_el1",
+      d4:	d538d081 	mrs	x1, tpidr_el1
+      d8:	f8616800 	ldr	x0, [x0, x1]
+      dc:	b4000280 	cbz	x0, 12c <cntvct_read_handler+0xbc>
+      e0:	f9401800 	ldr	x0, [x0, #48]
+      e4:	b4000240 	cbz	x0, 12c <cntvct_read_handler+0xbc>
+      e8:	d63f0000 	blr	x0
+      ec:	d5384102 	mrs	x2, sp_el0
+	/*
+	 * Because of load-store architectures cannot do per-cpu atomic
+	 * operations; we cannot use PREEMPT_NEED_RESCHED because it might get
+	 * lost.
+	 */
+	return !--*preempt_count_ptr() && tif_need_resched();
+      f0:	b9401041 	ldr	w1, [x2, #16]
+      f4:	51000421 	sub	w1, w1, #0x1
+      f8:	b9001041 	str	w1, [x2, #16]
+      fc:	35fffca1 	cbnz	w1, 90 <cntvct_read_handler+0x20>
+ * @nr: bit number to test
+ * @addr: Address to start counting from
+ */
+static inline int test_bit(int nr, const volatile unsigned long *addr)
+{
+	return 1UL & (addr[BIT_WORD(nr)] >> (nr & (BITS_PER_LONG-1)));
+     100:	f9400041 	ldr	x1, [x2]
+     104:	721f003f 	tst	w1, #0x2
+     108:	54fffc40 	b.eq	90 <cntvct_read_handler+0x20>  // b.none
+     10c:	f90017e0 	str	x0, [sp, #40]
+     110:	94000000 	bl	0 <preempt_schedule_notrace>
+     114:	f94017e0 	ldr	x0, [sp, #40]
+     118:	17ffffde 	b	90 <cntvct_read_handler+0x20>
+     11c:	97ffffb9 	bl	0 <arm64_skip_faulting_instruction.part.1>
+     120:	a94153f3 	ldp	x19, x20, [sp, #16]
+     124:	a8c37bfd 	ldp	x29, x30, [sp], #48
+     128:	d65f03c0 	ret
+     12c:	d53be040 	mrs	x0, cntvct_el0
+     130:	17ffffef 	b	ec <cntvct_read_handler+0x7c>
+     134:	d503201f 	nop
+
+0000000000000138 <ctr_read_handler>:
+	int rt = (esr & ESR_ELx_SYS64_ISS_RT_MASK) >> ESR_ELx_SYS64_ISS_RT_SHIFT;
+     138:	53052400 	ubfx	w0, w0, #5, #5
+	if (r != 31)
+     13c:	71007c1f 	cmp	w0, #0x1f
+     140:	54000100 	b.eq	160 <ctr_read_handler+0x28>  // b.none
+	return (u64)GENMASK(ftrp->shift + ftrp->width - 1, ftrp->shift);
+}
+
+static inline u64 arm64_ftr_reg_user_value(const struct arm64_ftr_reg *reg)
+{
+	return (reg->user_val | (reg->sys_val & reg->user_mask));
+     144:	90000003 	adrp	x3, 0 <arm64_ftr_reg_ctrel0>
+     148:	91000063 	add	x3, x3, #0x0
+     14c:	a9410864 	ldp	x4, x2, [x3, #16]
+     150:	f9401063 	ldr	x3, [x3, #32]
+     154:	8a040042 	and	x2, x2, x4
+     158:	aa030042 	orr	x2, x2, x3
+		regs->regs[r] = val;
+     15c:	f820d822 	str	x2, [x1, w0, sxtw #3]
+	if (user_mode(regs))
+     160:	a9500820 	ldp	x0, x2, [x1, #256]
+	regs->pc += size;
+     164:	91001000 	add	x0, x0, #0x4
+     168:	f9008020 	str	x0, [x1, #256]
+	if (user_mode(regs))
+     16c:	f2400c5f 	tst	x2, #0xf
+     170:	54000040 	b.eq	178 <ctr_read_handler+0x40>  // b.none
+     174:	d65f03c0 	ret
+{
+     178:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+     17c:	910003fd 	mov	x29, sp
+     180:	97ffffa0 	bl	0 <arm64_skip_faulting_instruction.part.1>
+}
+     184:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     188:	d65f03c0 	ret
+     18c:	d503201f 	nop
+
+0000000000000190 <dump_backtrace>:
+{
+     190:	a9ba7bfd 	stp	x29, x30, [sp, #-96]!
+     194:	910003fd 	mov	x29, sp
+     198:	a90153f3 	stp	x19, x20, [sp, #16]
+     19c:	90000013 	adrp	x19, 0 <__stack_chk_guard>
+     1a0:	91000273 	add	x19, x19, #0x0
+     1a4:	f9400262 	ldr	x2, [x19]
+     1a8:	f9002fa2 	str	x2, [x29, #88]
+     1ac:	d2800002 	mov	x2, #0x0                   	// #0
+     1b0:	a9025bf5 	stp	x21, x22, [sp, #32]
+     1b4:	aa0103f4 	mov	x20, x1
+     1b8:	aa0003f5 	mov	x21, x0
+	if (regs) {
+     1bc:	b4000380 	cbz	x0, 22c <dump_backtrace+0x9c>
+		if (user_mode(regs))
+     1c0:	f9408400 	ldr	x0, [x0, #264]
+		skip = 1;
+     1c4:	52800036 	mov	w22, #0x1                   	// #1
+		if (user_mode(regs))
+     1c8:	f2400c1f 	tst	x0, #0xf
+     1cc:	54000200 	b.eq	20c <dump_backtrace+0x7c>  // b.none
+	if (!tsk)
+     1d0:	b4000334 	cbz	x20, 234 <dump_backtrace+0xa4>
+})
+
+static __always_inline
+void __read_once_size(const volatile void *p, void *res, int size)
+{
+	__READ_ONCE_SIZE;
+     1d4:	b9496283 	ldr	w3, [x20, #2400]
+static inline int atomic_fetch_add_unless(atomic_t *v, int a, int u)
+{
+	int c = atomic_read(v);
+
+	do {
+		if (unlikely(c == u))
+     1d8:	340001a3 	cbz	w3, 20c <dump_backtrace+0x7c>
+     1dc:	91258284 	add	x4, x20, #0x960
+			break;
+	} while (!atomic_try_cmpxchg(v, &c, c + a));
+     1e0:	11000462 	add	w2, w3, #0x1
+__CMPXCHG_CASE(w, h, rel_2,  l, "memory")
+__CMPXCHG_CASE(w,  , rel_4,  l, "memory")
+__CMPXCHG_CASE(x,  , rel_8,  l, "memory")
+__CMPXCHG_CASE(w, b,  mb_1, al, "memory")
+__CMPXCHG_CASE(w, h,  mb_2, al, "memory")
+__CMPXCHG_CASE(w,  ,  mb_4, al, "memory")
+     1e4:	aa0403e0 	mov	x0, x4
+     1e8:	93407c61 	sxtw	x1, w3
+     1ec:	93407c42 	sxtw	x2, w2
+     1f0:	94000000 	bl	0 <__ll_sc___cmpxchg_case_mb_4>
+     1f4:	d503201f 	nop
+     1f8:	d503201f 	nop
+     1fc:	6b03001f 	cmp	w0, w3
+     200:	540001e1 	b.ne	23c <dump_backtrace+0xac>  // b.any
+	if (!try_get_task_stack(tsk))
+     204:	f9401280 	ldr	x0, [x20, #32]
+     208:	b5000240 	cbnz	x0, 250 <dump_backtrace+0xc0>
+}
+     20c:	f9402fa1 	ldr	x1, [x29, #88]
+     210:	f9400260 	ldr	x0, [x19]
+     214:	ca000020 	eor	x0, x1, x0
+     218:	b5000180 	cbnz	x0, 248 <dump_backtrace+0xb8>
+     21c:	a94153f3 	ldp	x19, x20, [sp, #16]
+     220:	a9425bf5 	ldp	x21, x22, [sp, #32]
+     224:	a8c67bfd 	ldp	x29, x30, [sp], #96
+     228:	d65f03c0 	ret
+	int skip = 0;
+     22c:	52800016 	mov	w22, #0x0                   	// #0
+	if (!tsk)
+     230:	b5fffd34 	cbnz	x20, 1d4 <dump_backtrace+0x44>
+     234:	d5384114 	mrs	x20, sp_el0
+
+	return (struct task_struct *)sp_el0;
+     238:	17ffffe7 	b	1d4 <dump_backtrace+0x44>
+		if (unlikely(c == u))
+     23c:	2a0003e3 	mov	w3, w0
+     240:	35fffd00 	cbnz	w0, 1e0 <dump_backtrace+0x50>
+     244:	17fffff2 	b	20c <dump_backtrace+0x7c>
+     248:	f9001bb7 	str	x23, [x29, #48]
+}
+     24c:	94000000 	bl	0 <__stack_chk_fail>
+     250:	f9001bb7 	str	x23, [x29, #48]
+	asm ("mrs %0, sp_el0" : "=r" (sp_el0));
+     254:	d5384100 	mrs	x0, sp_el0
+	if (tsk == current) {
+     258:	eb00029f 	cmp	x20, x0
+     25c:	540002a1 	b.ne	2b0 <dump_backtrace+0x120>  // b.any
+		frame.pc = (unsigned long)dump_backtrace;
+     260:	90000000 	adrp	x0, 190 <dump_backtrace>
+     264:	91000000 	add	x0, x0, #0x0
+     268:	a90483bd 	stp	x29, x0, [x29, #72]
+	printk(" %pS\n", (void *)where);
+     26c:	90000017 	adrp	x23, 0 <arm64_skip_faulting_instruction.part.1>
+     270:	910002f7 	add	x23, x23, #0x0
+	printk("Call trace:\n");
+     274:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     278:	91000000 	add	x0, x0, #0x0
+     27c:	94000000 	bl	0 <printk>
+		if (!skip) {
+     280:	35000236 	cbnz	w22, 2c4 <dump_backtrace+0x134>
+	printk(" %pS\n", (void *)where);
+     284:	f9402ba1 	ldr	x1, [x29, #80]
+     288:	aa1703e0 	mov	x0, x23
+     28c:	94000000 	bl	0 <printk>
+	} while (!unwind_frame(tsk, &frame));
+     290:	910123a1 	add	x1, x29, #0x48
+     294:	aa1403e0 	mov	x0, x20
+     298:	94000000 	bl	0 <unwind_frame>
+     29c:	34ffff20 	cbz	w0, 280 <dump_backtrace+0xf0>
+	put_task_stack(tsk);
+     2a0:	aa1403e0 	mov	x0, x20
+     2a4:	94000000 	bl	0 <put_task_stack>
+     2a8:	f9401bb7 	ldr	x23, [x29, #48]
+     2ac:	17ffffd8 	b	20c <dump_backtrace+0x7c>
+		frame.fp = thread_saved_fp(tsk);
+     2b0:	f944e280 	ldr	x0, [x20, #2496]
+     2b4:	f90027a0 	str	x0, [x29, #72]
+		frame.pc = thread_saved_pc(tsk);
+     2b8:	f944ea80 	ldr	x0, [x20, #2512]
+     2bc:	f9002ba0 	str	x0, [x29, #80]
+     2c0:	17ffffeb 	b	26c <dump_backtrace+0xdc>
+		} else if (frame.fp == regs->regs[29]) {
+     2c4:	f94027a1 	ldr	x1, [x29, #72]
+     2c8:	f94076a0 	ldr	x0, [x21, #232]
+     2cc:	eb00003f 	cmp	x1, x0
+     2d0:	54fffe01 	b.ne	290 <dump_backtrace+0x100>  // b.any
+	printk(" %pS\n", (void *)where);
+     2d4:	f94082a1 	ldr	x1, [x21, #256]
+			skip = 0;
+     2d8:	52800016 	mov	w22, #0x0                   	// #0
+	printk(" %pS\n", (void *)where);
+     2dc:	aa1703e0 	mov	x0, x23
+     2e0:	94000000 	bl	0 <printk>
+     2e4:	17ffffeb 	b	290 <dump_backtrace+0x100>
+
+00000000000002e8 <show_stack>:
+{
+     2e8:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+	dump_backtrace(NULL, tsk);
+     2ec:	aa0003e1 	mov	x1, x0
+     2f0:	d2800000 	mov	x0, #0x0                   	// #0
+{
+     2f4:	910003fd 	mov	x29, sp
+	dump_backtrace(NULL, tsk);
+     2f8:	94000000 	bl	190 <dump_backtrace>
+}
+     2fc:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     300:	d65f03c0 	ret
+     304:	d503201f 	nop
+
+0000000000000308 <die>:
+{
+     308:	a9bc7bfd 	stp	x29, x30, [sp, #-64]!
+     30c:	910003fd 	mov	x29, sp
+     310:	a90153f3 	stp	x19, x20, [sp, #16]
+	raw_spin_lock_irqsave(&die_lock, flags);
+     314:	90000013 	adrp	x19, 0 <arm64_skip_faulting_instruction.part.1>
+     318:	91000273 	add	x19, x19, #0x0
+{
+     31c:	aa0103f4 	mov	x20, x1
+     320:	a9025bf5 	stp	x21, x22, [sp, #32]
+     324:	2a0203f6 	mov	w22, w2
+     328:	aa0003f5 	mov	x21, x0
+	raw_spin_lock_irqsave(&die_lock, flags);
+     32c:	aa1303e0 	mov	x0, x19
+{
+     330:	a90363f7 	stp	x23, x24, [sp, #48]
+	raw_spin_lock_irqsave(&die_lock, flags);
+     334:	94000000 	bl	0 <_raw_spin_lock_irqsave>
+     338:	aa0003f7 	mov	x23, x0
+	oops_enter();
+     33c:	94000000 	bl	0 <oops_enter>
+	console_loglevel = CONSOLE_LOGLEVEL_SILENT;
+}
+
+static inline void console_verbose(void)
+{
+	if (console_loglevel)
+     340:	90000000 	adrp	x0, 0 <console_printk>
+     344:	b9400001 	ldr	w1, [x0]
+     348:	34000061 	cbz	w1, 354 <die+0x4c>
+		console_loglevel = CONSOLE_LOGLEVEL_MOTORMOUTH;
+     34c:	528001e1 	mov	w1, #0xf                   	// #15
+     350:	b9000001 	str	w1, [x0]
+	bust_spinlocks(1);
+     354:	52800020 	mov	w0, #0x1                   	// #1
+     358:	94000000 	bl	0 <bust_spinlocks>
+	pr_emerg("Internal error: %s: %x [#%d]" S_PREEMPT S_SMP "\n",
+     35c:	b9400664 	ldr	w4, [x19, #4]
+     360:	2a1603e2 	mov	w2, w22
+     364:	aa1503e1 	mov	x1, x21
+     368:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     36c:	11000484 	add	w4, w4, #0x1
+     370:	91000000 	add	x0, x0, #0x0
+     374:	2a0403e3 	mov	w3, w4
+     378:	b9000664 	str	w4, [x19, #4]
+     37c:	94000000 	bl	0 <printk>
+	ret = notify_die(DIE_OOPS, str, regs, err, 0, SIGSEGV);
+     380:	93407ec3 	sxtw	x3, w22
+     384:	aa1503e1 	mov	x1, x21
+     388:	52800165 	mov	w5, #0xb                   	// #11
+     38c:	52800004 	mov	w4, #0x0                   	// #0
+     390:	aa1403e2 	mov	x2, x20
+     394:	52800020 	mov	w0, #0x1                   	// #1
+     398:	94000000 	bl	0 <notify_die>
+     39c:	2a0003f6 	mov	w22, w0
+     3a0:	d5384115 	mrs	x21, sp_el0
+	if (ret == NOTIFY_STOP)
+     3a4:	52900020 	mov	w0, #0x8001                	// #32769
+     3a8:	6b0002df 	cmp	w22, w0
+     3ac:	540003a1 	b.ne	420 <die+0x118>  // b.any
+	if (regs && kexec_should_crash(current))
+     3b0:	b4000094 	cbz	x20, 3c0 <die+0xb8>
+     3b4:	d5384100 	mrs	x0, sp_el0
+     3b8:	94000000 	bl	0 <kexec_should_crash>
+     3bc:	35000780 	cbnz	w0, 4ac <die+0x1a4>
+	bust_spinlocks(0);
+     3c0:	52800000 	mov	w0, #0x0                   	// #0
+     3c4:	94000000 	bl	0 <bust_spinlocks>
+	add_taint(TAINT_DIE, LOCKDEP_NOW_UNRELIABLE);
+     3c8:	528000e0 	mov	w0, #0x7                   	// #7
+     3cc:	52800021 	mov	w1, #0x1                   	// #1
+     3d0:	94000000 	bl	0 <add_taint>
+	oops_exit();
+     3d4:	94000000 	bl	0 <oops_exit>
+     3d8:	d5384100 	mrs	x0, sp_el0
+     3dc:	b9401000 	ldr	w0, [x0, #16]
+	if (in_interrupt())
+     3e0:	7218301f 	tst	w0, #0x1fff00
+     3e4:	54000701 	b.ne	4c4 <die+0x1bc>  // b.any
+	if (panic_on_oops)
+     3e8:	90000000 	adrp	x0, 0 <panic_on_oops>
+     3ec:	b9400000 	ldr	w0, [x0]
+     3f0:	35000700 	cbnz	w0, 4d0 <die+0x1c8>
+	raw_spin_unlock_irqrestore(&die_lock, flags);
+     3f4:	aa1303e0 	mov	x0, x19
+     3f8:	aa1703e1 	mov	x1, x23
+     3fc:	94000000 	bl	0 <_raw_spin_unlock_irqrestore>
+	if (ret != NOTIFY_STOP)
+     400:	52900020 	mov	w0, #0x8001                	// #32769
+     404:	6b0002df 	cmp	w22, w0
+     408:	540006a1 	b.ne	4dc <die+0x1d4>  // b.any
+}
+     40c:	a94153f3 	ldp	x19, x20, [sp, #16]
+     410:	a9425bf5 	ldp	x21, x22, [sp, #32]
+     414:	a94363f7 	ldp	x23, x24, [sp, #48]
+     418:	a8c47bfd 	ldp	x29, x30, [sp], #64
+     41c:	d65f03c0 	ret
+	print_modules();
+     420:	94000000 	bl	0 <print_modules>
+	pr_emerg("Process %.*s (pid: %d, stack limit = 0x%p)\n",
+     424:	b94462a3 	ldr	w3, [x21, #1120]
+     428:	911822a2 	add	x2, x21, #0x608
+     42c:	f94012a4 	ldr	x4, [x21, #32]
+     430:	52800201 	mov	w1, #0x10                  	// #16
+     434:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     438:	91000000 	add	x0, x0, #0x0
+     43c:	94000000 	bl	0 <printk>
+	show_regs(regs);
+     440:	aa1403e0 	mov	x0, x20
+     444:	94000000 	bl	0 <show_regs>
+	if (!user_mode(regs))
+     448:	f9408680 	ldr	x0, [x20, #264]
+     44c:	f2400c1f 	tst	x0, #0xf
+     450:	54fffb00 	b.eq	3b0 <die+0xa8>  // b.none
+#define get_ds()	(KERNEL_DS)
+#define get_fs()	(current_thread_info()->addr_limit)
+
+static inline void set_fs(mm_segment_t fs)
+{
+	current_thread_info()->addr_limit = fs;
+     454:	92800000 	mov	x0, #0xffffffffffffffff    	// #-1
+		mm_segment_t fs = get_fs();
+     458:	f94006b8 	ldr	x24, [x21, #8]
+     45c:	f90006a0 	str	x0, [x21, #8]
+
+	/*
+	 * Prevent a mispredicted conditional call to set_fs from forwarding
+	 * the wrong address limit to access_ok under speculation.
+	 */
+	dsb(nsh);
+     460:	d503379f 	dsb	nsh
+	isb();
+     464:	d5033fdf 	isb
+ATOMIC64_OP(or, stset)
+     468:	d2800400 	mov	x0, #0x20                  	// #32
+     46c:	aa1503e1 	mov	x1, x21
+     470:	94000000 	bl	0 <__ll_sc_atomic64_or>
+	/*
+	 * Enable/disable UAO so that copy_to_user() etc can access
+	 * kernel memory with the unprivileged instructions.
+	 */
+	if (IS_ENABLED(CONFIG_ARM64_UAO) && fs == KERNEL_DS)
+		asm(ALTERNATIVE("nop", SET_PSTATE_UAO(1), ARM64_HAS_UAO));
+     474:	d503201f 	nop
+		__dump_instr(lvl, regs);
+     478:	f9408280 	ldr	x0, [x20, #256]
+     47c:	94000000 	bl	0 <arm64_skip_faulting_instruction.part.1>
+	current_thread_info()->addr_limit = fs;
+     480:	f90006b8 	str	x24, [x21, #8]
+	dsb(nsh);
+     484:	d503379f 	dsb	nsh
+	isb();
+     488:	d5033fdf 	isb
+     48c:	d2800400 	mov	x0, #0x20                  	// #32
+     490:	aa1503e1 	mov	x1, x21
+     494:	94000000 	bl	0 <__ll_sc_atomic64_or>
+	if (IS_ENABLED(CONFIG_ARM64_UAO) && fs == KERNEL_DS)
+     498:	b100071f 	cmn	x24, #0x1
+     49c:	540000e1 	b.ne	4b8 <die+0x1b0>  // b.any
+		asm(ALTERNATIVE("nop", SET_PSTATE_UAO(1), ARM64_HAS_UAO));
+     4a0:	d503201f 	nop
+	if (regs && kexec_should_crash(current))
+     4a4:	b5fff894 	cbnz	x20, 3b4 <die+0xac>
+     4a8:	17ffffc6 	b	3c0 <die+0xb8>
+		crash_kexec(regs);
+     4ac:	aa1403e0 	mov	x0, x20
+     4b0:	94000000 	bl	0 <crash_kexec>
+     4b4:	17ffffc3 	b	3c0 <die+0xb8>
+	else
+		asm(ALTERNATIVE("nop", SET_PSTATE_UAO(0), ARM64_HAS_UAO,
+     4b8:	d503201f 	nop
+	if (regs && kexec_should_crash(current))
+     4bc:	b5fff7d4 	cbnz	x20, 3b4 <die+0xac>
+     4c0:	17ffffc0 	b	3c0 <die+0xb8>
+		panic("Fatal exception in interrupt");
+     4c4:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     4c8:	91000000 	add	x0, x0, #0x0
+     4cc:	94000000 	bl	0 <panic>
+		panic("Fatal exception");
+     4d0:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     4d4:	91000000 	add	x0, x0, #0x0
+     4d8:	94000000 	bl	0 <panic>
+		do_exit(SIGSEGV);
+     4dc:	d2800160 	mov	x0, #0xb                   	// #11
+     4e0:	94000000 	bl	0 <do_exit>
+     4e4:	d503201f 	nop
+
+00000000000004e8 <bug_handler>:
+	return 1;
+}
+
+static int bug_handler(struct pt_regs *regs, unsigned int esr)
+{
+	if (user_mode(regs))
+     4e8:	f9408401 	ldr	x1, [x0, #264]
+     4ec:	f2400c3f 	tst	x1, #0xf
+     4f0:	54000061 	b.ne	4fc <bug_handler+0x14>  // b.any
+		return DBG_HOOK_ERROR;
+     4f4:	52800020 	mov	w0, #0x1                   	// #1
+	}
+
+	/* If thread survives, skip over the BUG instruction and continue: */
+	arm64_skip_faulting_instruction(regs, AARCH64_INSN_SIZE);
+	return DBG_HOOK_HANDLED;
+}
+     4f8:	d65f03c0 	ret
+{
+     4fc:	a9bd7bfd 	stp	x29, x30, [sp, #-48]!
+	switch (report_bug(regs->pc, regs)) {
+     500:	aa0003e1 	mov	x1, x0
+{
+     504:	910003fd 	mov	x29, sp
+     508:	f9000bf3 	str	x19, [sp, #16]
+     50c:	aa0003f3 	mov	x19, x0
+	switch (report_bug(regs->pc, regs)) {
+     510:	f9408000 	ldr	x0, [x0, #256]
+     514:	94000000 	bl	0 <report_bug>
+     518:	7100041f 	cmp	w0, #0x1
+     51c:	54000120 	b.eq	540 <bug_handler+0x58>  // b.none
+     520:	7100081f 	cmp	w0, #0x2
+		return DBG_HOOK_ERROR;
+     524:	52800020 	mov	w0, #0x1                   	// #1
+	switch (report_bug(regs->pc, regs)) {
+     528:	54000181 	b.ne	558 <bug_handler+0x70>  // b.any
+		die("Oops - BUG", regs, 0);
+     52c:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     530:	52800002 	mov	w2, #0x0                   	// #0
+     534:	91000000 	add	x0, x0, #0x0
+     538:	aa1303e1 	mov	x1, x19
+     53c:	94000000 	bl	308 <die>
+	if (user_mode(regs))
+     540:	a9500a61 	ldp	x1, x2, [x19, #256]
+     544:	52800000 	mov	w0, #0x0                   	// #0
+	regs->pc += size;
+     548:	91001021 	add	x1, x1, #0x4
+     54c:	f9008261 	str	x1, [x19, #256]
+	if (user_mode(regs))
+     550:	f2400c5f 	tst	x2, #0xf
+     554:	54000080 	b.eq	564 <bug_handler+0x7c>  // b.none
+}
+     558:	f9400bf3 	ldr	x19, [sp, #16]
+     55c:	a8c37bfd 	ldp	x29, x30, [sp], #48
+     560:	d65f03c0 	ret
+     564:	b9002fe0 	str	w0, [sp, #44]
+     568:	97fffea6 	bl	0 <arm64_skip_faulting_instruction.part.1>
+     56c:	b9402fe0 	ldr	w0, [sp, #44]
+     570:	f9400bf3 	ldr	x19, [sp, #16]
+     574:	a8c37bfd 	ldp	x29, x30, [sp], #48
+     578:	d65f03c0 	ret
+     57c:	d503201f 	nop
+
+0000000000000580 <arm64_force_sig_info>:
+{
+     580:	a9bc7bfd 	stp	x29, x30, [sp, #-64]!
+     584:	910003fd 	mov	x29, sp
+     588:	a90153f3 	stp	x19, x20, [sp, #16]
+     58c:	aa0003f4 	mov	x20, x0
+     590:	aa0203f3 	mov	x19, x2
+     594:	a9025bf5 	stp	x21, x22, [sp, #32]
+	if (!unhandled_signal(tsk, info->si_signo))
+     598:	aa0203e0 	mov	x0, x2
+{
+     59c:	a90363f7 	stp	x23, x24, [sp, #48]
+     5a0:	aa0103f7 	mov	x23, x1
+	if (!unhandled_signal(tsk, info->si_signo))
+     5a4:	b9400281 	ldr	w1, [x20]
+ * try_get_task_stack() instead.  task_stack_page will return a pointer
+ * that could get freed out from under you.
+ */
+static inline void *task_stack_page(const struct task_struct *task)
+{
+	return task->stack;
+     5a8:	f9401055 	ldr	x21, [x2, #32]
+	unsigned int esr = tsk->thread.fault_code;
+     5ac:	f9461056 	ldr	x22, [x2, #3104]
+	if (!unhandled_signal(tsk, info->si_signo))
+     5b0:	94000000 	bl	0 <unhandled_signal>
+     5b4:	72001c1f 	tst	w0, #0xff
+     5b8:	54000080 	b.eq	5c8 <arm64_force_sig_info+0x48>  // b.none
+	return show_unhandled_signals && __ratelimit(&rs);
+     5bc:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     5c0:	b9400000 	ldr	w0, [x0]
+     5c4:	35000140 	cbnz	w0, 5ec <arm64_force_sig_info+0x6c>
+	force_sig_info(info->si_signo, info, tsk);
+     5c8:	b9400280 	ldr	w0, [x20]
+     5cc:	aa1303e2 	mov	x2, x19
+     5d0:	aa1403e1 	mov	x1, x20
+     5d4:	94000000 	bl	0 <force_sig_info>
+}
+     5d8:	a94153f3 	ldp	x19, x20, [sp, #16]
+     5dc:	a9425bf5 	ldp	x21, x22, [sp, #32]
+     5e0:	a94363f7 	ldp	x23, x24, [sp, #48]
+     5e4:	a8c47bfd 	ldp	x29, x30, [sp], #64
+     5e8:	d65f03c0 	ret
+	return show_unhandled_signals && __ratelimit(&rs);
+     5ec:	90000018 	adrp	x24, 0 <arm64_skip_faulting_instruction.part.1>
+     5f0:	91000318 	add	x24, x24, #0x0
+     5f4:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     5f8:	aa1803e1 	mov	x1, x24
+     5fc:	91000000 	add	x0, x0, #0x0
+     600:	94000000 	bl	0 <___ratelimit>
+     604:	34fffe20 	cbz	w0, 5c8 <arm64_force_sig_info+0x48>
+	pr_info("%s[%d]: unhandled exception: ", tsk->comm, task_pid_nr(tsk));
+     608:	b9446262 	ldr	w2, [x19, #1120]
+     60c:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     610:	91182261 	add	x1, x19, #0x608
+     614:	91000000 	add	x0, x0, #0x0
+     618:	94000000 	bl	0 <printk>
+	if (esr)
+     61c:	34000116 	cbz	w22, 63c <arm64_force_sig_info+0xbc>
+	return esr_class_str[ESR_ELx_EC(esr)];
+     620:	9100a318 	add	x24, x24, #0x28
+     624:	531a7ec1 	lsr	w1, w22, #26
+		pr_cont("%s, ESR 0x%08x, ", esr_get_class_string(esr), esr);
+     628:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     62c:	2a1603e2 	mov	w2, w22
+     630:	91000000 	add	x0, x0, #0x0
+     634:	f8617b01 	ldr	x1, [x24, x1, lsl #3]
+     638:	94000000 	bl	0 <printk>
+	pr_cont("%s", str);
+     63c:	aa1703e1 	mov	x1, x23
+     640:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     644:	91000000 	add	x0, x0, #0x0
+     648:	94000000 	bl	0 <printk>
+	print_vma_addr(KERN_CONT " in ", regs->pc);
+     64c:	f95fe2a1 	ldr	x1, [x21, #16320]
+     650:	d287d802 	mov	x2, #0x3ec0                	// #16064
+     654:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     658:	8b0202b5 	add	x21, x21, x2
+     65c:	91000000 	add	x0, x0, #0x0
+     660:	94000000 	bl	0 <print_vma_addr>
+	pr_cont("\n");
+     664:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     668:	91000000 	add	x0, x0, #0x0
+     66c:	94000000 	bl	0 <printk>
+	__show_regs(regs);
+     670:	aa1503e0 	mov	x0, x21
+     674:	94000000 	bl	0 <__show_regs>
+     678:	17ffffd4 	b	5c8 <arm64_force_sig_info+0x48>
+     67c:	d503201f 	nop
+
+0000000000000680 <arm64_notify_die>:
+{
+     680:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+     684:	910003fd 	mov	x29, sp
+	if (user_mode(regs)) {
+     688:	f9408425 	ldr	x5, [x1, #264]
+     68c:	f2400cbf 	tst	x5, #0xf
+     690:	54000261 	b.ne	6dc <arm64_notify_die+0x5c>  // b.any
+     694:	aa0003e6 	mov	x6, x0
+     698:	aa0103e4 	mov	x4, x1
+     69c:	d5384100 	mrs	x0, sp_el0
+		WARN_ON(regs != current_pt_regs());
+     6a0:	f9401000 	ldr	x0, [x0, #32]
+     6a4:	d287d801 	mov	x1, #0x3ec0                	// #16064
+     6a8:	8b010000 	add	x0, x0, x1
+     6ac:	eb00009f 	cmp	x4, x0
+     6b0:	540001e1 	b.ne	6ec <arm64_notify_die+0x6c>  // b.any
+		current->thread.fault_code = err;
+     6b4:	93407c63 	sxtw	x3, w3
+		arm64_force_sig_info(info, str, current);
+     6b8:	aa0203e0 	mov	x0, x2
+     6bc:	d5384104 	mrs	x4, sp_el0
+		current->thread.fault_address = 0;
+     6c0:	f9060c9f 	str	xzr, [x4, #3096]
+		arm64_force_sig_info(info, str, current);
+     6c4:	aa0603e1 	mov	x1, x6
+		current->thread.fault_code = err;
+     6c8:	f9061083 	str	x3, [x4, #3104]
+		arm64_force_sig_info(info, str, current);
+     6cc:	aa0403e2 	mov	x2, x4
+     6d0:	94000000 	bl	580 <arm64_force_sig_info>
+}
+     6d4:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     6d8:	d65f03c0 	ret
+		die(str, regs, err);
+     6dc:	2a0303e2 	mov	w2, w3
+     6e0:	94000000 	bl	308 <die>
+}
+     6e4:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     6e8:	d65f03c0 	ret
+		WARN_ON(regs != current_pt_regs());
+     6ec:	d4210000 	brk	#0x800
+     6f0:	17fffff1 	b	6b4 <arm64_notify_die+0x34>
+     6f4:	d503201f 	nop
+
+00000000000006f8 <arm64_skip_faulting_instruction>:
+	if (user_mode(regs))
+     6f8:	a9500c02 	ldp	x2, x3, [x0, #256]
+	regs->pc += size;
+     6fc:	8b010041 	add	x1, x2, x1
+     700:	f9008001 	str	x1, [x0, #256]
+	if (user_mode(regs))
+     704:	f2400c7f 	tst	x3, #0xf
+     708:	54000040 	b.eq	710 <arm64_skip_faulting_instruction+0x18>  // b.none
+     70c:	d65f03c0 	ret
+{
+     710:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+     714:	910003fd 	mov	x29, sp
+     718:	97fffe3a 	bl	0 <arm64_skip_faulting_instruction.part.1>
+}
+     71c:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     720:	d65f03c0 	ret
+     724:	d503201f 	nop
+
+0000000000000728 <register_undef_hook>:
+{
+     728:	a9be7bfd 	stp	x29, x30, [sp, #-32]!
+     72c:	910003fd 	mov	x29, sp
+     730:	a90153f3 	stp	x19, x20, [sp, #16]
+	raw_spin_lock_irqsave(&undef_lock, flags);
+     734:	90000013 	adrp	x19, 0 <arm64_skip_faulting_instruction.part.1>
+     738:	91000273 	add	x19, x19, #0x0
+     73c:	91004273 	add	x19, x19, #0x10
+{
+     740:	aa0003f4 	mov	x20, x0
+	raw_spin_lock_irqsave(&undef_lock, flags);
+     744:	aa1303e0 	mov	x0, x19
+     748:	94000000 	bl	0 <_raw_spin_lock_irqsave>
+ * Insert a new entry after the specified head.
+ * This is good for implementing stacks.
+ */
+static inline void list_add(struct list_head *new, struct list_head *head)
+{
+	__list_add(new, head, head->next);
+     74c:	90000002 	adrp	x2, 0 <arm64_skip_faulting_instruction.part.1>
+     750:	91000042 	add	x2, x2, #0x0
+     754:	aa0203e3 	mov	x3, x2
+	raw_spin_unlock_irqrestore(&undef_lock, flags);
+     758:	aa0003e1 	mov	x1, x0
+     75c:	aa1303e0 	mov	x0, x19
+     760:	f8428c64 	ldr	x4, [x3, #40]!
+	next->prev = new;
+     764:	f9000494 	str	x20, [x4, #8]
+	new->prev = prev;
+     768:	a9000e84 	stp	x4, x3, [x20]
+{
+	switch (size) {
+	case 1: *(volatile __u8 *)p = *(__u8 *)res; break;
+	case 2: *(volatile __u16 *)p = *(__u16 *)res; break;
+	case 4: *(volatile __u32 *)p = *(__u32 *)res; break;
+	case 8: *(volatile __u64 *)p = *(__u64 *)res; break;
+     76c:	f9001454 	str	x20, [x2, #40]
+     770:	94000000 	bl	0 <_raw_spin_unlock_irqrestore>
+}
+     774:	a94153f3 	ldp	x19, x20, [sp, #16]
+     778:	a8c27bfd 	ldp	x29, x30, [sp], #32
+     77c:	d65f03c0 	ret
+
+0000000000000780 <unregister_undef_hook>:
+{
+     780:	a9be7bfd 	stp	x29, x30, [sp, #-32]!
+     784:	910003fd 	mov	x29, sp
+     788:	a90153f3 	stp	x19, x20, [sp, #16]
+     78c:	aa0003f4 	mov	x20, x0
+	raw_spin_lock_irqsave(&undef_lock, flags);
+     790:	90000013 	adrp	x19, 0 <arm64_skip_faulting_instruction.part.1>
+     794:	91000273 	add	x19, x19, #0x0
+     798:	91004273 	add	x19, x19, #0x10
+     79c:	aa1303e0 	mov	x0, x19
+     7a0:	94000000 	bl	0 <_raw_spin_lock_irqsave>
+static inline void __list_del_entry(struct list_head *entry)
+{
+	if (!__list_del_entry_valid(entry))
+		return;
+
+	__list_del(entry->prev, entry->next);
+     7a4:	a9400a83 	ldp	x3, x2, [x20]
+	next->prev = prev;
+     7a8:	f9000462 	str	x2, [x3, #8]
+}
+
+static inline void list_del(struct list_head *entry)
+{
+	__list_del_entry(entry);
+	entry->next = LIST_POISON1;
+     7ac:	d2802005 	mov	x5, #0x100                 	// #256
+	entry->prev = LIST_POISON2;
+     7b0:	d2804004 	mov	x4, #0x200                 	// #512
+	entry->next = LIST_POISON1;
+     7b4:	f2fbd5a5 	movk	x5, #0xdead, lsl #48
+	entry->prev = LIST_POISON2;
+     7b8:	f2fbd5a4 	movk	x4, #0xdead, lsl #48
+	raw_spin_unlock_irqrestore(&undef_lock, flags);
+     7bc:	aa0003e1 	mov	x1, x0
+     7c0:	aa1303e0 	mov	x0, x19
+     7c4:	f9000043 	str	x3, [x2]
+     7c8:	a9001285 	stp	x5, x4, [x20]
+     7cc:	94000000 	bl	0 <_raw_spin_unlock_irqrestore>
+}
+     7d0:	a94153f3 	ldp	x19, x20, [sp, #16]
+     7d4:	a8c27bfd 	ldp	x29, x30, [sp], #32
+     7d8:	d65f03c0 	ret
+     7dc:	d503201f 	nop
+
+00000000000007e0 <force_signal_inject>:
+{
+     7e0:	a9b37bfd 	stp	x29, x30, [sp, #-208]!
+     7e4:	910003fd 	mov	x29, sp
+     7e8:	a90153f3 	stp	x19, x20, [sp, #16]
+     7ec:	2a0003f3 	mov	w19, w0
+     7f0:	d5384100 	mrs	x0, sp_el0
+     7f4:	a9025bf5 	stp	x21, x22, [sp, #32]
+     7f8:	90000015 	adrp	x21, 0 <__stack_chk_guard>
+     7fc:	910002b5 	add	x21, x21, #0x0
+     800:	a90363f7 	stp	x23, x24, [sp, #48]
+     804:	f94002a3 	ldr	x3, [x21]
+     808:	f90067e3 	str	x3, [sp, #200]
+     80c:	d2800003 	mov	x3, #0x0                   	// #0
+     810:	2a0103f7 	mov	w23, w1
+	struct pt_regs *regs = current_pt_regs();
+     814:	f9401000 	ldr	x0, [x0, #32]
+	memcpy(to, from, sizeof(*to));
+}
+
+static inline void clear_siginfo(struct siginfo *info)
+{
+	memset(info, 0, sizeof(*info));
+     818:	a904ffff 	stp	xzr, xzr, [sp, #72]
+     81c:	d287d801 	mov	x1, #0x3ec0                	// #16064
+     820:	a905ffff 	stp	xzr, xzr, [sp, #88]
+	switch (signal) {
+     824:	7100127f 	cmp	w19, #0x4
+{
+     828:	aa0203f8 	mov	x24, x2
+     82c:	a906ffff 	stp	xzr, xzr, [sp, #104]
+	struct pt_regs *regs = current_pt_regs();
+     830:	8b010016 	add	x22, x0, x1
+     834:	a907ffff 	stp	xzr, xzr, [sp, #120]
+     838:	a908ffff 	stp	xzr, xzr, [sp, #136]
+     83c:	a909ffff 	stp	xzr, xzr, [sp, #152]
+     840:	a90affff 	stp	xzr, xzr, [sp, #168]
+     844:	a90bffff 	stp	xzr, xzr, [sp, #184]
+	switch (signal) {
+     848:	54000440 	b.eq	8d0 <force_signal_inject+0xf0>  // b.none
+     84c:	71002e7f 	cmp	w19, #0xb
+     850:	540002c0 	b.eq	8a8 <force_signal_inject+0xc8>  // b.none
+		desc = "unknown or unrecoverable error";
+     854:	90000014 	adrp	x20, 0 <arm64_skip_faulting_instruction.part.1>
+	if (WARN_ON(signal != SIGKILL &&
+     858:	7100267f 	cmp	w19, #0x9
+		desc = "unknown or unrecoverable error";
+     85c:	91000294 	add	x20, x20, #0x0
+	if (WARN_ON(signal != SIGKILL &&
+     860:	54000281 	b.ne	8b0 <force_signal_inject+0xd0>  // b.any
+	arm64_notify_die(desc, regs, &info, 0);
+     864:	aa1603e1 	mov	x1, x22
+     868:	aa1403e0 	mov	x0, x20
+     86c:	52800003 	mov	w3, #0x0                   	// #0
+     870:	910123e2 	add	x2, sp, #0x48
+	info.si_errno = 0;
+     874:	29097ff3 	stp	w19, wzr, [sp, #72]
+	info.si_code  = code;
+     878:	b90053f7 	str	w23, [sp, #80]
+	info.si_addr  = (void __user *)address;
+     87c:	f9002ff8 	str	x24, [sp, #88]
+	arm64_notify_die(desc, regs, &info, 0);
+     880:	94000000 	bl	680 <arm64_notify_die>
+}
+     884:	f94067e1 	ldr	x1, [sp, #200]
+     888:	f94002a0 	ldr	x0, [x21]
+     88c:	ca000020 	eor	x0, x1, x0
+     890:	b5000260 	cbnz	x0, 8dc <force_signal_inject+0xfc>
+     894:	a94153f3 	ldp	x19, x20, [sp, #16]
+     898:	a9425bf5 	ldp	x21, x22, [sp, #32]
+     89c:	a94363f7 	ldp	x23, x24, [sp, #48]
+     8a0:	a8cd7bfd 	ldp	x29, x30, [sp], #208
+     8a4:	d65f03c0 	ret
+		desc = "illegal memory access";
+     8a8:	90000014 	adrp	x20, 0 <arm64_skip_faulting_instruction.part.1>
+     8ac:	91000294 	add	x20, x20, #0x0
+	if (WARN_ON(signal != SIGKILL &&
+     8b0:	2a1703e1 	mov	w1, w23
+     8b4:	2a1303e0 	mov	w0, w19
+     8b8:	94000000 	bl	0 <siginfo_layout>
+     8bc:	71000c1f 	cmp	w0, #0x3
+     8c0:	54fffd20 	b.eq	864 <force_signal_inject+0x84>  // b.none
+     8c4:	d4210000 	brk	#0x800
+		signal = SIGKILL;
+     8c8:	52800133 	mov	w19, #0x9                   	// #9
+     8cc:	17ffffe6 	b	864 <force_signal_inject+0x84>
+		desc = "undefined instruction";
+     8d0:	90000014 	adrp	x20, 0 <arm64_skip_faulting_instruction.part.1>
+     8d4:	91000294 	add	x20, x20, #0x0
+     8d8:	17fffff6 	b	8b0 <force_signal_inject+0xd0>
+}
+     8dc:	94000000 	bl	0 <__stack_chk_fail>
+
+00000000000008e0 <arm64_notify_segfault>:
+{
+     8e0:	a9be7bfd 	stp	x29, x30, [sp, #-32]!
+     8e4:	910003fd 	mov	x29, sp
+     8e8:	a90153f3 	stp	x19, x20, [sp, #16]
+     8ec:	aa0003f4 	mov	x20, x0
+     8f0:	d5384113 	mrs	x19, sp_el0
+	down_read(&current->mm->mmap_sem);
+     8f4:	f941da61 	ldr	x1, [x19, #944]
+     8f8:	91018020 	add	x0, x1, #0x60
+     8fc:	94000000 	bl	0 <down_read>
+	if (find_vma(current->mm, addr) == NULL)
+     900:	f941da60 	ldr	x0, [x19, #944]
+     904:	aa1403e1 	mov	x1, x20
+     908:	94000000 	bl	0 <find_vma>
+		code = SEGV_ACCERR;
+     90c:	f100001f 	cmp	x0, #0x0
+	up_read(&current->mm->mmap_sem);
+     910:	f941da60 	ldr	x0, [x19, #944]
+		code = SEGV_ACCERR;
+     914:	1a9f07f3 	cset	w19, ne  // ne = any
+     918:	11000673 	add	w19, w19, #0x1
+	up_read(&current->mm->mmap_sem);
+     91c:	91018000 	add	x0, x0, #0x60
+     920:	94000000 	bl	0 <up_read>
+	force_signal_inject(SIGSEGV, code, addr);
+     924:	aa1403e2 	mov	x2, x20
+     928:	2a1303e1 	mov	w1, w19
+     92c:	52800160 	mov	w0, #0xb                   	// #11
+     930:	94000000 	bl	7e0 <force_signal_inject>
+}
+     934:	a94153f3 	ldp	x19, x20, [sp, #16]
+     938:	a8c27bfd 	ldp	x29, x30, [sp], #32
+     93c:	d65f03c0 	ret
+
+0000000000000940 <user_cache_maint_handler>:
+	int rt = (esr & ESR_ELx_SYS64_ISS_RT_MASK) >> ESR_ELx_SYS64_ISS_RT_SHIFT;
+     940:	2a0003e2 	mov	w2, w0
+{
+     944:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+     948:	d2800000 	mov	x0, #0x0                   	// #0
+	int rt = (esr & ESR_ELx_SYS64_ISS_RT_MASK) >> ESR_ELx_SYS64_ISS_RT_SHIFT;
+     94c:	53052443 	ubfx	w3, w2, #5, #5
+{
+     950:	910003fd 	mov	x29, sp
+	int crm = (esr & ESR_ELx_SYS64_ISS_CRM_MASK) >> ESR_ELx_SYS64_ISS_CRM_SHIFT;
+     954:	53011042 	ubfx	w2, w2, #1, #4
+	return (r == 31) ? 0 : regs->regs[r];
+     958:	71007c7f 	cmp	w3, #0x1f
+     95c:	54000060 	b.eq	968 <user_cache_maint_handler+0x28>  // b.none
+     960:	f863d820 	ldr	x0, [x1, w3, sxtw #3]
+     964:	9340dc00 	sbfx	x0, x0, #0, #56
+	switch (crm) {
+     968:	71002c5f 	cmp	w2, #0xb
+     96c:	540000c0 	b.eq	984 <user_cache_maint_handler+0x44>  // b.none
+     970:	5400018d 	b.le	9a0 <user_cache_maint_handler+0x60>
+     974:	7100305f 	cmp	w2, #0xc
+     978:	540004a0 	b.eq	a0c <user_cache_maint_handler+0xcc>  // b.none
+     97c:	7100385f 	cmp	w2, #0xe
+     980:	54000181 	b.ne	9b0 <user_cache_maint_handler+0x70>  // b.any
+     984:	d5384102 	mrs	x2, sp_el0
+		__user_cache_maint("dc civac", address, ret);
+     988:	f9400442 	ldr	x2, [x2, #8]
+     98c:	eb00005f 	cmp	x2, x0
+     990:	540001c8 	b.hi	9c8 <user_cache_maint_handler+0x88>  // b.pmore
+		arm64_notify_segfault(address);
+     994:	94000000 	bl	8e0 <arm64_notify_segfault>
+}
+     998:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     99c:	d65f03c0 	ret
+	switch (crm) {
+     9a0:	7100145f 	cmp	w2, #0x5
+     9a4:	54000260 	b.eq	9f0 <user_cache_maint_handler+0xb0>  // b.none
+     9a8:	7100285f 	cmp	w2, #0xa
+     9ac:	54fffec0 	b.eq	984 <user_cache_maint_handler+0x44>  // b.none
+		force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc);
+     9b0:	f9408022 	ldr	x2, [x1, #256]
+     9b4:	52800080 	mov	w0, #0x4                   	// #4
+     9b8:	52800021 	mov	w1, #0x1                   	// #1
+     9bc:	94000000 	bl	7e0 <force_signal_inject>
+}
+     9c0:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     9c4:	d65f03c0 	ret
+		__user_cache_maint("dc civac", address, ret);
+     9c8:	d50b7e20 	dc	civac, x0
+     9cc:	52800002 	mov	w2, #0x0                   	// #0
+	if (ret)
+     9d0:	35fffe22 	cbnz	w2, 994 <user_cache_maint_handler+0x54>
+	if (user_mode(regs))
+     9d4:	a9500820 	ldp	x0, x2, [x1, #256]
+	regs->pc += size;
+     9d8:	91001000 	add	x0, x0, #0x4
+     9dc:	f9008020 	str	x0, [x1, #256]
+	if (user_mode(regs))
+     9e0:	f2400c5f 	tst	x2, #0xf
+     9e4:	54fffda1 	b.ne	998 <user_cache_maint_handler+0x58>  // b.any
+     9e8:	97fffd86 	bl	0 <arm64_skip_faulting_instruction.part.1>
+     9ec:	17ffffeb 	b	998 <user_cache_maint_handler+0x58>
+     9f0:	d5384102 	mrs	x2, sp_el0
+		__user_cache_maint("ic ivau", address, ret);
+     9f4:	f9400442 	ldr	x2, [x2, #8]
+     9f8:	eb00005f 	cmp	x2, x0
+     9fc:	54fffcc9 	b.ls	994 <user_cache_maint_handler+0x54>  // b.plast
+     a00:	d50b7520 	ic	ivau, x0
+     a04:	52800002 	mov	w2, #0x0                   	// #0
+	return true;
+}
+#else
+static inline bool uaccess_ttbr0_disable(void)
+{
+	return false;
+     a08:	17fffff2 	b	9d0 <user_cache_maint_handler+0x90>
+     a0c:	d5384102 	mrs	x2, sp_el0
+		__user_cache_maint("sys 3, c7, c12, 1", address, ret);
+     a10:	f9400442 	ldr	x2, [x2, #8]
+     a14:	eb00005f 	cmp	x2, x0
+     a18:	54fffbe9 	b.ls	994 <user_cache_maint_handler+0x54>  // b.plast
+     a1c:	d50b7c20 	dc	cvap, x0
+     a20:	52800002 	mov	w2, #0x0                   	// #0
+     a24:	17ffffeb 	b	9d0 <user_cache_maint_handler+0x90>
+
+0000000000000a28 <cpu_enable_cache_maint_trap>:
+	sysreg_clear_set(sctlr_el1, SCTLR_EL1_UCI, 0);
+     a28:	d5381000 	mrs	x0, sctlr_el1
+     a2c:	9265f801 	and	x1, x0, #0xfffffffffbffffff
+     a30:	36d00040 	tbz	w0, #26, a38 <cpu_enable_cache_maint_trap+0x10>
+     a34:	d5181001 	msr	sctlr_el1, x1
+}
+     a38:	d65f03c0 	ret
+     a3c:	d503201f 	nop
+
+0000000000000a40 <esr_get_class_string>:
+	return esr_class_str[ESR_ELx_EC(esr)];
+     a40:	90000001 	adrp	x1, 0 <arm64_skip_faulting_instruction.part.1>
+     a44:	91000021 	add	x1, x1, #0x0
+     a48:	9100a021 	add	x1, x1, #0x28
+     a4c:	531a7c00 	lsr	w0, w0, #26
+}
+     a50:	f8607820 	ldr	x0, [x1, x0, lsl #3]
+     a54:	d65f03c0 	ret
+
+0000000000000a58 <bad_el0_sync>:
+{
+     a58:	a9b57bfd 	stp	x29, x30, [sp, #-176]!
+	current->thread.fault_code = esr;
+     a5c:	2a0203e1 	mov	w1, w2
+	info.si_signo = SIGILL;
+     a60:	52800086 	mov	w6, #0x4                   	// #4
+{
+     a64:	910003fd 	mov	x29, sp
+     a68:	f9000bf3 	str	x19, [sp, #16]
+     a6c:	9100b3e3 	add	x3, sp, #0x2c
+     a70:	90000013 	adrp	x19, 0 <__stack_chk_guard>
+     a74:	91000273 	add	x19, x19, #0x0
+	void __user *pc = (void __user *)instruction_pointer(regs);
+     a78:	f9408004 	ldr	x4, [x0, #256]
+     a7c:	d5384102 	mrs	x2, sp_el0
+	info.si_code  = ILL_ILLOPC;
+     a80:	52800025 	mov	w5, #0x1                   	// #1
+     a84:	a9007c7f 	stp	xzr, xzr, [x3]
+	arm64_force_sig_info(&info, "Bad EL0 synchronous exception", current);
+     a88:	9100a3e0 	add	x0, sp, #0x28
+     a8c:	a9017c7f 	stp	xzr, xzr, [x3, #16]
+     a90:	a9027c7f 	stp	xzr, xzr, [x3, #32]
+     a94:	a9037c7f 	stp	xzr, xzr, [x3, #48]
+     a98:	a9047c7f 	stp	xzr, xzr, [x3, #64]
+     a9c:	a9057c7f 	stp	xzr, xzr, [x3, #80]
+     aa0:	a9067c7f 	stp	xzr, xzr, [x3, #96]
+     aa4:	f900387f 	str	xzr, [x3, #112]
+     aa8:	b900787f 	str	wzr, [x3, #120]
+	current->thread.fault_address = 0;
+     aac:	f9060c5f 	str	xzr, [x2, #3096]
+	current->thread.fault_code = esr;
+     ab0:	f9061041 	str	x1, [x2, #3104]
+{
+     ab4:	f9400261 	ldr	x1, [x19]
+     ab8:	f90057e1 	str	x1, [sp, #168]
+     abc:	d2800001 	mov	x1, #0x0                   	// #0
+	arm64_force_sig_info(&info, "Bad EL0 synchronous exception", current);
+     ac0:	90000001 	adrp	x1, 0 <arm64_skip_faulting_instruction.part.1>
+     ac4:	91000021 	add	x1, x1, #0x0
+	info.si_signo = SIGILL;
+     ac8:	b9002be6 	str	w6, [sp, #40]
+	info.si_code  = ILL_ILLOPC;
+     acc:	b90033e5 	str	w5, [sp, #48]
+	info.si_addr  = pc;
+     ad0:	f9001fe4 	str	x4, [sp, #56]
+	arm64_force_sig_info(&info, "Bad EL0 synchronous exception", current);
+     ad4:	94000000 	bl	580 <arm64_force_sig_info>
+}
+     ad8:	f94057e1 	ldr	x1, [sp, #168]
+     adc:	f9400260 	ldr	x0, [x19]
+     ae0:	ca000020 	eor	x0, x1, x0
+     ae4:	b5000080 	cbnz	x0, af4 <bad_el0_sync+0x9c>
+     ae8:	f9400bf3 	ldr	x19, [sp, #16]
+     aec:	a8cb7bfd 	ldp	x29, x30, [sp], #176
+     af0:	d65f03c0 	ret
+     af4:	94000000 	bl	0 <__stack_chk_fail>
+
+0000000000000af8 <user_enter_check>:
+{
+     af8:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+	if((in_container_range(current->nsproxy, NSPROXY) || get_flag(current->nsproxy) == CONTAINER_NSPROXY) && (regs->regs[8] == __NR_getppid))
+     afc:	92a03e02 	mov	x2, #0xfffffffffe0fffff    	// #-32505857
+     b00:	d5384101 	mrs	x1, sp_el0
+{
+     b04:	910003fd 	mov	x29, sp
+	if((in_container_range(current->nsproxy, NSPROXY) || get_flag(current->nsproxy) == CONTAINER_NSPROXY) && (regs->regs[8] == __NR_getppid))
+     b08:	f9432421 	ldr	x1, [x1, #1608]
+     b0c:	f2cfbfe2 	movk	x2, #0x7dff, lsl #32
+     b10:	eb02003f 	cmp	x1, x2
+     b14:	540005c9 	b.ls	bcc <user_enter_check+0xd4>  // b.plast
+     b18:	91500042 	add	x2, x2, #0x400, lsl #12
+     b1c:	eb02003f 	cmp	x1, x2
+     b20:	54000568 	b.hi	bcc <user_enter_check+0xd4>  // b.pmore
+     b24:	f9402003 	ldr	x3, [x0, #64]
+     b28:	f102b47f 	cmp	x3, #0xad
+     b2c:	54000660 	b.eq	bf8 <user_enter_check+0x100>  // b.none
+     b30:	d5384101 	mrs	x1, sp_el0
+	if(in_container_range(current->nsproxy, NSPROXY))
+     b34:	f9432420 	ldr	x0, [x1, #1608]
+     b38:	92a03e02 	mov	x2, #0xfffffffffe0fffff    	// #-32505857
+     b3c:	f2cfbfe2 	movk	x2, #0x7dff, lsl #32
+     b40:	eb02001f 	cmp	x0, x2
+     b44:	540000e9 	b.ls	b60 <user_enter_check+0x68>  // b.plast
+     b48:	91500042 	add	x2, x2, #0x400, lsl #12
+     b4c:	eb02001f 	cmp	x0, x2
+     b50:	54000088 	b.hi	b60 <user_enter_check+0x68>  // b.pmore
+		current->nsproxy = (struct nsproxy *)mask_con_value(NSPROXY, current->nsproxy);
+     b54:	9240bc00 	and	x0, x0, #0xffffffffffff
+     b58:	b24e0000 	orr	x0, x0, #0x4000000000000
+     b5c:	f9032420 	str	x0, [x1, #1608]
+     b60:	d5384101 	mrs	x1, sp_el0
+	if(in_container_range(current->cred, CRED))
+     b64:	f9430020 	ldr	x0, [x1, #1536]
+     b68:	92a07e02 	mov	x2, #0xfffffffffc0fffff    	// #-66060289
+     b6c:	f2cfbfe2 	movk	x2, #0x7dff, lsl #32
+     b70:	eb02001f 	cmp	x0, x2
+     b74:	54000109 	b.ls	b94 <user_enter_check+0x9c>  // b.plast
+     b78:	92a03e02 	mov	x2, #0xfffffffffe0fffff    	// #-32505857
+     b7c:	f2cfbfe2 	movk	x2, #0x7dff, lsl #32
+     b80:	eb02001f 	cmp	x0, x2
+     b84:	54000088 	b.hi	b94 <user_enter_check+0x9c>  // b.pmore
+		current->cred = (struct cred *)mask_con_value(CRED, current->cred);
+     b88:	9240bc00 	and	x0, x0, #0xffffffffffff
+     b8c:	b24f0000 	orr	x0, x0, #0x2000000000000
+     b90:	f9030020 	str	x0, [x1, #1536]
+     b94:	d5384101 	mrs	x1, sp_el0
+	if(in_container_range(current->fs, FS))
+     b98:	f9431c20 	ldr	x0, [x1, #1592]
+     b9c:	92a03602 	mov	x2, #0xfffffffffe4fffff    	// #-28311553
+     ba0:	f2cfbfe2 	movk	x2, #0x7dff, lsl #32
+     ba4:	eb02001f 	cmp	x0, x2
+     ba8:	540000e9 	b.ls	bc4 <user_enter_check+0xcc>  // b.plast
+     bac:	91440042 	add	x2, x2, #0x100, lsl #12
+     bb0:	eb02001f 	cmp	x0, x2
+     bb4:	54000088 	b.hi	bc4 <user_enter_check+0xcc>  // b.pmore
+		current->fs = (struct fs_struct *)mask_con_value(FS, current->fs);
+     bb8:	9240bc00 	and	x0, x0, #0xffffffffffff
+     bbc:	b24d0000 	orr	x0, x0, #0x8000000000000
+     bc0:	f9031c20 	str	x0, [x1, #1592]
+}
+     bc4:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     bc8:	d65f03c0 	ret
+     bcc:	d5384101 	mrs	x1, sp_el0
+	if((in_container_range(current->nsproxy, NSPROXY) || get_flag(current->nsproxy) == CONTAINER_NSPROXY) && (regs->regs[8] == __NR_getppid))
+     bd0:	39593821 	ldrb	w1, [x1, #1614]
+     bd4:	f100103f 	cmp	x1, #0x4
+     bd8:	54fffa60 	b.eq	b24 <user_enter_check+0x2c>  // b.none
+     bdc:	d5384101 	mrs	x1, sp_el0
+	if(in_container_range(current->nsproxy, NSPROXY))
+     be0:	f9432420 	ldr	x0, [x1, #1608]
+     be4:	92a03e02 	mov	x2, #0xfffffffffe0fffff    	// #-32505857
+     be8:	f2cfbfe2 	movk	x2, #0x7dff, lsl #32
+     bec:	eb02001f 	cmp	x0, x2
+     bf0:	54fffb89 	b.ls	b60 <user_enter_check+0x68>  // b.plast
+     bf4:	17ffffd5 	b	b48 <user_enter_check+0x50>
+		pr_alert("%s: regs %#lx, %d, %d getppid............... ", __func__, regs, regs->regs[8],__NR_getppid);
+     bf8:	90000001 	adrp	x1, 0 <arm64_skip_faulting_instruction.part.1>
+     bfc:	91000021 	add	x1, x1, #0x0
+     c00:	aa0003e2 	mov	x2, x0
+     c04:	91092021 	add	x1, x1, #0x248
+     c08:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     c0c:	2a0303e4 	mov	w4, w3
+     c10:	91000000 	add	x0, x0, #0x0
+     c14:	94000000 	bl	0 <printk>
+     c18:	17ffffc6 	b	b30 <user_enter_check+0x38>
+     c1c:	d503201f 	nop
+
+0000000000000c20 <user_exit_check>:
+{
+     c20:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+	if((in_container_range(current->nsproxy, NSPROXY)) || in_container_range(current->cred, CRED) || in_container_range(current->fs, FS))
+     c24:	92a03e01 	mov	x1, #0xfffffffffe0fffff    	// #-32505857
+     c28:	d5384100 	mrs	x0, sp_el0
+{
+     c2c:	910003fd 	mov	x29, sp
+	if((in_container_range(current->nsproxy, NSPROXY)) || in_container_range(current->cred, CRED) || in_container_range(current->fs, FS))
+     c30:	f9432400 	ldr	x0, [x0, #1608]
+     c34:	f2cfbfe1 	movk	x1, #0x7dff, lsl #32
+     c38:	eb01001f 	cmp	x0, x1
+     c3c:	54000089 	b.ls	c4c <user_exit_check+0x2c>  // b.plast
+     c40:	91500021 	add	x1, x1, #0x400, lsl #12
+     c44:	eb01001f 	cmp	x0, x1
+     c48:	540002c9 	b.ls	ca0 <user_exit_check+0x80>  // b.plast
+     c4c:	d5384100 	mrs	x0, sp_el0
+     c50:	f9430000 	ldr	x0, [x0, #1536]
+     c54:	92a07e01 	mov	x1, #0xfffffffffc0fffff    	// #-66060289
+     c58:	f2cfbfe1 	movk	x1, #0x7dff, lsl #32
+     c5c:	eb01001f 	cmp	x0, x1
+     c60:	540000a9 	b.ls	c74 <user_exit_check+0x54>  // b.plast
+     c64:	92a03e01 	mov	x1, #0xfffffffffe0fffff    	// #-32505857
+     c68:	f2cfbfe1 	movk	x1, #0x7dff, lsl #32
+     c6c:	eb01001f 	cmp	x0, x1
+     c70:	54000189 	b.ls	ca0 <user_exit_check+0x80>  // b.plast
+     c74:	d5384100 	mrs	x0, sp_el0
+     c78:	f9431c00 	ldr	x0, [x0, #1592]
+     c7c:	92a03601 	mov	x1, #0xfffffffffe4fffff    	// #-28311553
+     c80:	f2cfbfe1 	movk	x1, #0x7dff, lsl #32
+     c84:	eb01001f 	cmp	x0, x1
+     c88:	54000089 	b.ls	c98 <user_exit_check+0x78>  // b.plast
+     c8c:	91440021 	add	x1, x1, #0x100, lsl #12
+     c90:	eb01001f 	cmp	x0, x1
+     c94:	54000069 	b.ls	ca0 <user_exit_check+0x80>  // b.plast
+}
+     c98:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     c9c:	d65f03c0 	ret
+     ca0:	d5384100 	mrs	x0, sp_el0
+		pr_alert("%s: there is something error!, current->nsproxy %#lx, current->cred %#lx, current->fs %#lx", __func__, current->nsproxy, current->cred, current->fs);
+     ca4:	f9430003 	ldr	x3, [x0, #1536]
+     ca8:	90000001 	adrp	x1, 0 <arm64_skip_faulting_instruction.part.1>
+     cac:	f9431c04 	ldr	x4, [x0, #1592]
+     cb0:	91000021 	add	x1, x1, #0x0
+     cb4:	f9432402 	ldr	x2, [x0, #1608]
+     cb8:	91098021 	add	x1, x1, #0x260
+     cbc:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     cc0:	91000000 	add	x0, x0, #0x0
+     cc4:	94000000 	bl	0 <printk>
+}
+     cc8:	17fffff4 	b	c98 <user_exit_check+0x78>
+     ccc:	d503201f 	nop
+
+0000000000000cd0 <user_exit_svc_check>:
+{
+     cd0:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+     cd4:	d5384101 	mrs	x1, sp_el0
+     cd8:	910003fd 	mov	x29, sp
+		if((get_flag(current->nsproxy) == CONTAINER_NSPROXY) && (regs->regs[8] == __NR_getppid))
+     cdc:	39593821 	ldrb	w1, [x1, #1614]
+     ce0:	f100103f 	cmp	x1, #0x4
+     ce4:	540003e0 	b.eq	d60 <user_exit_svc_check+0x90>  // b.none
+     ce8:	d5384100 	mrs	x0, sp_el0
+	if((in_container_range(current->nsproxy, NSPROXY)) || in_container_range(current->cred, CRED) || in_container_range(current->fs, FS))
+     cec:	f9432400 	ldr	x0, [x0, #1608]
+     cf0:	92a03e01 	mov	x1, #0xfffffffffe0fffff    	// #-32505857
+     cf4:	f2cfbfe1 	movk	x1, #0x7dff, lsl #32
+     cf8:	eb01001f 	cmp	x0, x1
+     cfc:	54000089 	b.ls	d0c <user_exit_svc_check+0x3c>  // b.plast
+     d00:	91500021 	add	x1, x1, #0x400, lsl #12
+     d04:	eb01001f 	cmp	x0, x1
+     d08:	54000449 	b.ls	d90 <user_exit_svc_check+0xc0>  // b.plast
+     d0c:	d5384100 	mrs	x0, sp_el0
+     d10:	f9430000 	ldr	x0, [x0, #1536]
+     d14:	92a07e01 	mov	x1, #0xfffffffffc0fffff    	// #-66060289
+     d18:	f2cfbfe1 	movk	x1, #0x7dff, lsl #32
+     d1c:	eb01001f 	cmp	x0, x1
+     d20:	540000a9 	b.ls	d34 <user_exit_svc_check+0x64>  // b.plast
+     d24:	92a03e01 	mov	x1, #0xfffffffffe0fffff    	// #-32505857
+     d28:	f2cfbfe1 	movk	x1, #0x7dff, lsl #32
+     d2c:	eb01001f 	cmp	x0, x1
+     d30:	54000309 	b.ls	d90 <user_exit_svc_check+0xc0>  // b.plast
+     d34:	d5384100 	mrs	x0, sp_el0
+     d38:	f9431c00 	ldr	x0, [x0, #1592]
+     d3c:	92a03601 	mov	x1, #0xfffffffffe4fffff    	// #-28311553
+     d40:	f2cfbfe1 	movk	x1, #0x7dff, lsl #32
+     d44:	eb01001f 	cmp	x0, x1
+     d48:	54000089 	b.ls	d58 <user_exit_svc_check+0x88>  // b.plast
+     d4c:	91440021 	add	x1, x1, #0x100, lsl #12
+     d50:	eb01001f 	cmp	x0, x1
+     d54:	540001e9 	b.ls	d90 <user_exit_svc_check+0xc0>  // b.plast
+}
+     d58:	a8c17bfd 	ldp	x29, x30, [sp], #16
+     d5c:	d65f03c0 	ret
+		if((get_flag(current->nsproxy) == CONTAINER_NSPROXY) && (regs->regs[8] == __NR_getppid))
+     d60:	f9402003 	ldr	x3, [x0, #64]
+     d64:	f102b47f 	cmp	x3, #0xad
+     d68:	54fffc01 	b.ne	ce8 <user_exit_svc_check+0x18>  // b.any
+			pr_alert("%s: regs %#lx, %d, %d getppid............... ", __func__, regs, regs->regs[8], __NR_getppid);
+     d6c:	90000001 	adrp	x1, 0 <arm64_skip_faulting_instruction.part.1>
+     d70:	91000021 	add	x1, x1, #0x0
+     d74:	aa0003e2 	mov	x2, x0
+     d78:	9109c021 	add	x1, x1, #0x270
+     d7c:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     d80:	2a0303e4 	mov	w4, w3
+     d84:	91000000 	add	x0, x0, #0x0
+     d88:	94000000 	bl	0 <printk>
+     d8c:	17ffffd7 	b	ce8 <user_exit_svc_check+0x18>
+     d90:	d5384100 	mrs	x0, sp_el0
+		pr_alert("%s: there is something error!, current->nsproxy %#lx, current->cred %#lx, current->fs %#lx", __func__, current->nsproxy, current->cred, current->fs);
+     d94:	f9430003 	ldr	x3, [x0, #1536]
+     d98:	90000001 	adrp	x1, 0 <arm64_skip_faulting_instruction.part.1>
+     d9c:	f9431c04 	ldr	x4, [x0, #1592]
+     da0:	91000021 	add	x1, x1, #0x0
+     da4:	f9432402 	ldr	x2, [x0, #1608]
+     da8:	9109c021 	add	x1, x1, #0x270
+     dac:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     db0:	91000000 	add	x0, x0, #0x0
+     db4:	94000000 	bl	0 <printk>
+}
+     db8:	17ffffe8 	b	d58 <user_exit_svc_check+0x88>
+     dbc:	d503201f 	nop
+
+0000000000000dc0 <handle_bad_stack>:
+{
+     dc0:	a9bc7bfd 	stp	x29, x30, [sp, #-64]!
+     dc4:	d5384101 	mrs	x1, sp_el0
+     dc8:	910003fd 	mov	x29, sp
+     dcc:	a90153f3 	stp	x19, x20, [sp, #16]
+     dd0:	a9025bf5 	stp	x21, x22, [sp, #32]
+     dd4:	a90363f7 	stp	x23, x24, [sp, #48]
+     dd8:	aa0003f8 	mov	x24, x0
+	*preempt_count_ptr() += val;
+     ddc:	b9401022 	ldr	w2, [x1, #16]
+	unsigned long tsk_stk = (unsigned long)current->stack;
+     de0:	f9401034 	ldr	x20, [x1, #32]
+     de4:	11000442 	add	w2, w2, #0x1
+     de8:	b9001022 	str	w2, [x1, #16]
+	unsigned long irq_stk = (unsigned long)this_cpu_read(irq_stack_ptr);
+     dec:	90000000 	adrp	x0, 0 <irq_stack_ptr>
+     df0:	91000000 	add	x0, x0, #0x0
+     df4:	d538d082 	mrs	x2, tpidr_el1
+	__READ_ONCE_SIZE;
+     df8:	f8626815 	ldr	x21, [x0, x2]
+	return !--*preempt_count_ptr() && tif_need_resched();
+     dfc:	b9401020 	ldr	w0, [x1, #16]
+     e00:	51000400 	sub	w0, w0, #0x1
+     e04:	b9001020 	str	w0, [x1, #16]
+     e08:	350000c0 	cbnz	w0, e20 <handle_bad_stack+0x60>
+     e0c:	f9400020 	ldr	x0, [x1]
+     e10:	721f001f 	tst	w0, #0x2
+     e14:	54000060 	b.eq	e20 <handle_bad_stack+0x60>  // b.none
+     e18:	94000000 	bl	0 <preempt_schedule_notrace>
+     e1c:	d503201f 	nop
+	unsigned long ovf_stk = (unsigned long)this_cpu_ptr(overflow_stack);
+     e20:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     e24:	91000000 	add	x0, x0, #0x0
+     e28:	d538d093 	mrs	x19, tpidr_el1
+	unsigned int esr = read_sysreg(esr_el1);
+     e2c:	d5385216 	mrs	x22, esr_el1
+	unsigned long far = read_sysreg(far_el1);
+     e30:	d5386017 	mrs	x23, far_el1
+	if (console_loglevel)
+     e34:	90000001 	adrp	x1, 0 <console_printk>
+     e38:	b9400022 	ldr	w2, [x1]
+     e3c:	350005e2 	cbnz	w2, ef8 <handle_bad_stack+0x138>
+	unsigned long ovf_stk = (unsigned long)this_cpu_ptr(overflow_stack);
+     e40:	8b130013 	add	x19, x0, x19
+	pr_emerg("Insufficient stack space to handle exception! esr %#lx, far %#lx, tsk_stk: %#lx, irq_stk: %#lx, ovf_sk %#lx", esr, far, tsk_stk, irq_stk, ovf_stk);
+     e44:	aa1503e4 	mov	x4, x21
+     e48:	aa1303e5 	mov	x5, x19
+     e4c:	aa1403e3 	mov	x3, x20
+     e50:	aa1703e2 	mov	x2, x23
+     e54:	2a1603e1 	mov	w1, w22
+     e58:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     e5c:	91000000 	add	x0, x0, #0x0
+     e60:	94000000 	bl	0 <printk>
+	return esr_class_str[ESR_ELx_EC(esr)];
+     e64:	90000002 	adrp	x2, 0 <arm64_skip_faulting_instruction.part.1>
+     e68:	91000042 	add	x2, x2, #0x0
+     e6c:	531a7ec3 	lsr	w3, w22, #26
+     e70:	9100a042 	add	x2, x2, #0x28
+	pr_emerg("ESR: 0x%08x -- %s\n", esr, esr_get_class_string(esr));
+     e74:	2a1603e1 	mov	w1, w22
+     e78:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     e7c:	91000000 	add	x0, x0, #0x0
+     e80:	f8637842 	ldr	x2, [x2, x3, lsl #3]
+     e84:	94000000 	bl	0 <printk>
+	pr_emerg("FAR: 0x%016lx\n", far);
+     e88:	aa1703e1 	mov	x1, x23
+     e8c:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     e90:	91000000 	add	x0, x0, #0x0
+     e94:	94000000 	bl	0 <printk>
+	pr_emerg("Task stack:     [0x%016lx..0x%016lx]\n",
+     e98:	91401282 	add	x2, x20, #0x4, lsl #12
+     e9c:	aa1403e1 	mov	x1, x20
+     ea0:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     ea4:	91000000 	add	x0, x0, #0x0
+     ea8:	94000000 	bl	0 <printk>
+	pr_emerg("IRQ stack:      [0x%016lx..0x%016lx]\n",
+     eac:	914012a2 	add	x2, x21, #0x4, lsl #12
+     eb0:	aa1503e1 	mov	x1, x21
+     eb4:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     eb8:	91000000 	add	x0, x0, #0x0
+     ebc:	94000000 	bl	0 <printk>
+	pr_emerg("Overflow stack: [0x%016lx..0x%016lx]\n",
+     ec0:	aa1303e1 	mov	x1, x19
+     ec4:	91400662 	add	x2, x19, #0x1, lsl #12
+     ec8:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     ecc:	91000000 	add	x0, x0, #0x0
+     ed0:	94000000 	bl	0 <printk>
+	__show_regs(regs);
+     ed4:	aa1803e0 	mov	x0, x24
+     ed8:	94000000 	bl	0 <__show_regs>
+	nmi_panic(NULL, "kernel stack overflow");
+     edc:	90000001 	adrp	x1, 0 <arm64_skip_faulting_instruction.part.1>
+     ee0:	d2800000 	mov	x0, #0x0                   	// #0
+     ee4:	91000021 	add	x1, x1, #0x0
+     ee8:	94000000 	bl	0 <nmi_panic>
+extern void cpu_die_early(void);
+
+static inline void cpu_park_loop(void)
+{
+	for (;;) {
+		wfe();
+     eec:	d503205f 	wfe
+		wfi();
+     ef0:	d503207f 	wfi
+     ef4:	17fffffe 	b	eec <handle_bad_stack+0x12c>
+		console_loglevel = CONSOLE_LOGLEVEL_MOTORMOUTH;
+     ef8:	528001e2 	mov	w2, #0xf                   	// #15
+     efc:	b9000022 	str	w2, [x1]
+     f00:	17ffffd0 	b	e40 <handle_bad_stack+0x80>
+     f04:	d503201f 	nop
+
+0000000000000f08 <arm64_is_fatal_ras_serror>:
+{
+     f08:	a9be7bfd 	stp	x29, x30, [sp, #-32]!
+     f0c:	d5384102 	mrs	x2, sp_el0
+     f10:	910003fd 	mov	x29, sp
+     f14:	a90153f3 	stp	x19, x20, [sp, #16]
+     f18:	aa0003f4 	mov	x20, x0
+     f1c:	2a0103f3 	mov	w19, w1
+     f20:	b9401042 	ldr	w2, [x2, #16]
+ * errors share the same encoding as an all-zeros encoding from a CPU that
+ * doesn't support RAS.
+ */
+static inline bool arm64_is_ras_serror(u32 esr)
+{
+	WARN_ON(preemptible());
+     f24:	35000062 	cbnz	w2, f30 <arm64_is_fatal_ras_serror+0x28>
+ * Save the current interrupt enable state.
+ */
+static inline unsigned long arch_local_save_flags(void)
+{
+	unsigned long flags;
+	asm volatile(
+     f28:	d53b4220 	mrs	x0, daif
+     f2c:	363800a0 	tbz	w0, #7, f40 <arm64_is_fatal_ras_serror+0x38>
+
+	if (esr & ESR_ELx_IDS)
+     f30:	36c000d3 	tbz	w19, #24, f48 <arm64_is_fatal_ras_serror+0x40>
+		arm64_serror_panic(regs, esr);
+     f34:	2a1303e1 	mov	w1, w19
+     f38:	aa1403e0 	mov	x0, x20
+     f3c:	94000000 	bl	1a4 <dump_backtrace+0x14>
+	WARN_ON(preemptible());
+     f40:	d4210000 	brk	#0x800
+	if (esr & ESR_ELx_IDS)
+     f44:	37c7ff93 	tbnz	w19, #24, f34 <arm64_is_fatal_ras_serror+0x2c>
+		return false;
+
+	if (this_cpu_has_cap(ARM64_HAS_RAS_EXTN))
+     f48:	52800320 	mov	w0, #0x19                  	// #25
+     f4c:	94000000 	bl	0 <this_cpu_has_cap>
+     f50:	72001c00 	ands	w0, w0, #0xff
+     f54:	54ffff00 	b.eq	f34 <arm64_is_fatal_ras_serror+0x2c>  // b.none
+
+	/*
+	 * AET is RES0 if 'the value returned in the DFSC field is not
+	 * [ESR_ELx_FSC_SERROR]'
+	 */
+	if ((esr & ESR_ELx_FSC) != ESR_ELx_FSC_SERROR) {
+     f58:	12001661 	and	w1, w19, #0x3f
+     f5c:	7100443f 	cmp	w1, #0x11
+     f60:	54fffea1 	b.ne	f34 <arm64_is_fatal_ras_serror+0x2c>  // b.any
+	u32 aet = esr & ESR_ELx_AET;
+     f64:	12160a61 	and	w1, w19, #0x1c00
+	switch (aet) {
+     f68:	7120003f 	cmp	w1, #0x800
+     f6c:	54000200 	b.eq	fac <arm64_is_fatal_ras_serror+0xa4>  // b.none
+     f70:	54000149 	b.ls	f98 <arm64_is_fatal_ras_serror+0x90>  // b.plast
+     f74:	7130003f 	cmp	w1, #0xc00
+     f78:	540000a0 	b.eq	f8c <arm64_is_fatal_ras_serror+0x84>  // b.none
+     f7c:	52830002 	mov	w2, #0x1800                	// #6144
+		return false;
+     f80:	52800000 	mov	w0, #0x0                   	// #0
+	switch (aet) {
+     f84:	6b02003f 	cmp	w1, w2
+     f88:	54fffd61 	b.ne	f34 <arm64_is_fatal_ras_serror+0x2c>  // b.any
+}
+     f8c:	a94153f3 	ldp	x19, x20, [sp, #16]
+     f90:	a8c27bfd 	ldp	x29, x30, [sp], #32
+     f94:	d65f03c0 	ret
+	switch (aet) {
+     f98:	7110003f 	cmp	w1, #0x400
+     f9c:	54fffcc1 	b.ne	f34 <arm64_is_fatal_ras_serror+0x2c>  // b.any
+}
+     fa0:	a94153f3 	ldp	x19, x20, [sp, #16]
+     fa4:	a8c27bfd 	ldp	x29, x30, [sp], #32
+     fa8:	d65f03c0 	ret
+		return false;
+     fac:	52800000 	mov	w0, #0x0                   	// #0
+     fb0:	17fffff7 	b	f8c <arm64_is_fatal_ras_serror+0x84>
+     fb4:	d503201f 	nop
+
+0000000000000fb8 <do_serror>:
+{
+     fb8:	d10103ff 	sub	sp, sp, #0x40
+     fbc:	a9017bfd 	stp	x29, x30, [sp, #16]
+     fc0:	910043fd 	add	x29, sp, #0x10
+     fc4:	a90253f3 	stp	x19, x20, [sp, #32]
+     fc8:	aa0003f3 	mov	x19, x0
+     fcc:	f9001bf5 	str	x21, [sp, #48]
+     fd0:	2a0103f5 	mov	w21, w1
+	unsigned long addr = read_sysreg(far_el1);
+     fd4:	d5386014 	mrs	x20, far_el1
+	count++;
+     fd8:	90000003 	adrp	x3, 0 <arm64_skip_faulting_instruction.part.1>
+     fdc:	91000063 	add	x3, x3, #0x0
+	pr_err("do_serror count %d", count);
+     fe0:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+     fe4:	91000000 	add	x0, x0, #0x0
+	count++;
+     fe8:	b9401461 	ldr	w1, [x3, #20]
+     fec:	11000421 	add	w1, w1, #0x1
+     ff0:	b9001461 	str	w1, [x3, #20]
+	pr_err("do_serror count %d", count);
+     ff4:	94000000 	bl	0 <printk>
+	current_thread_info()->addr_limit = fs;
+     ff8:	92800000 	mov	x0, #0xffffffffffffffff    	// #-1
+     ffc:	d5384101 	mrs	x1, sp_el0
+	mm_segment_t fs = get_fs();
+    1000:	f9400423 	ldr	x3, [x1, #8]
+    1004:	f9000420 	str	x0, [x1, #8]
+	dsb(nsh);
+    1008:	d503379f 	dsb	nsh
+	isb();
+    100c:	d5033fdf 	isb
+    1010:	d2800400 	mov	x0, #0x20                  	// #32
+    1014:	94000000 	bl	0 <__ll_sc_atomic64_or>
+		asm(ALTERNATIVE("nop", SET_PSTATE_UAO(1), ARM64_HAS_UAO));
+    1018:	d503201f 	nop
+	unsigned long ret, limit = current_thread_info()->addr_limit;
+    101c:	f9400424 	ldr	x4, [x1, #8]
+	asm volatile(
+    1020:	aa1403e0 	mov	x0, x20
+    1024:	aa0403e1 	mov	x1, x4
+    1028:	b1001000 	adds	x0, x0, #0x4
+    102c:	9a8183e1 	csel	x1, xzr, x1, hi  // hi = pmore
+    1030:	da9f3000 	csinv	x0, x0, xzr, cc  // cc = lo, ul, last
+    1034:	fa01001f 	sbcs	xzr, x0, x1
+    1038:	9a9f87e0 	cset	x0, ls  // ls = plast
+	bad = get_user(instr, &((u32 *)addr)[0]);
+    103c:	b4000420 	cbz	x0, 10c0 <do_serror+0x108>
+#define uaccess_mask_ptr(ptr) (__typeof__(ptr))__uaccess_mask_ptr(ptr)
+static inline void __user *__uaccess_mask_ptr(const void __user *ptr)
+{
+	void __user *safe_ptr;
+
+	asm volatile(
+    1040:	ea24029f 	bics	xzr, x20, x4
+    1044:	9a9f0281 	csel	x1, x20, xzr, eq  // eq = none
+	"	csel	%0, %1, xzr, eq\n"
+	: "=&r" (safe_ptr)
+	: "r" (ptr), "r" (current_thread_info()->addr_limit)
+	: "cc");
+
+	csdb();
+    1048:	d503229f 	csdb
+	__uaccess_enable(ARM64_ALT_PAN_NOT_UAO);
+    104c:	d503201f 	nop
+    1050:	52800000 	mov	w0, #0x0                   	// #0
+    1054:	b9400027 	ldr	w7, [x1]
+	__uaccess_disable(ARM64_ALT_PAN_NOT_UAO);
+    1058:	d503201f 	nop
+    105c:	2a0003e6 	mov	w6, w0
+    1060:	d5384101 	mrs	x1, sp_el0
+	current_thread_info()->addr_limit = fs;
+    1064:	f9000423 	str	x3, [x1, #8]
+	dsb(nsh);
+    1068:	d503379f 	dsb	nsh
+	isb();
+    106c:	d5033fdf 	isb
+    1070:	d2800400 	mov	x0, #0x20                  	// #32
+    1074:	94000000 	bl	0 <__ll_sc_atomic64_or>
+	if (IS_ENABLED(CONFIG_ARM64_UAO) && fs == KERNEL_DS)
+    1078:	b100047f 	cmn	x3, #0x1
+    107c:	54000280 	b.eq	10cc <do_serror+0x114>  // b.none
+		asm(ALTERNATIVE("nop", SET_PSTATE_UAO(0), ARM64_HAS_UAO,
+    1080:	d503201f 	nop
+	pr_crit("SError Interrupt regs: %#llx, esr %#llx, lr %#llx , elr_el1 %#llx, far %#llx, pc %#llx, instr %#lx , bad %d\n", regs, esr, regs->regs[30], read_sysreg(elr_el1), read_sysreg(far_el1), regs->pc, instr, bad);
+    1084:	d5384024 	mrs	x4, elr_el1
+    1088:	d5386005 	mrs	x5, far_el1
+    108c:	f9407a63 	ldr	x3, [x19, #240]
+    1090:	b90003e6 	str	w6, [sp]
+    1094:	2a1503e2 	mov	w2, w21
+    1098:	aa1303e1 	mov	x1, x19
+    109c:	f9408266 	ldr	x6, [x19, #256]
+    10a0:	90000000 	adrp	x0, 0 <arm64_skip_faulting_instruction.part.1>
+    10a4:	91000000 	add	x0, x0, #0x0
+    10a8:	94000000 	bl	0 <printk>
+}
+    10ac:	a9417bfd 	ldp	x29, x30, [sp, #16]
+    10b0:	a94253f3 	ldp	x19, x20, [sp, #32]
+    10b4:	f9401bf5 	ldr	x21, [sp, #48]
+    10b8:	910103ff 	add	sp, sp, #0x40
+    10bc:	d65f03c0 	ret
+    10c0:	128001a6 	mov	w6, #0xfffffff2            	// #-14
+	bad = get_user(instr, &((u32 *)addr)[0]);
+    10c4:	52800007 	mov	w7, #0x0                   	// #0
+    10c8:	17ffffe6 	b	1060 <do_serror+0xa8>
+		asm(ALTERNATIVE("nop", SET_PSTATE_UAO(1), ARM64_HAS_UAO));
+    10cc:	d503201f 	nop
+    10d0:	17ffffed 	b	1084 <do_serror+0xcc>
+    10d4:	d503201f 	nop
+
+00000000000010d8 <is_valid_bugaddr>:
+}
+    10d8:	52800020 	mov	w0, #0x1                   	// #1
+    10dc:	d65f03c0 	ret
+
+Disassembly of section .text.unlikely:
+
+0000000000000000 <__dump_instr.isra.0.constprop.6>:
+static void __dump_instr(const char *lvl, struct pt_regs *regs)
+   0:	a9b77bfd 	stp	x29, x30, [sp, #-144]!
+   4:	910003fd 	mov	x29, sp
+   8:	a90153f3 	stp	x19, x20, [sp, #16]
+   c:	90000014 	adrp	x20, 0 <__stack_chk_guard>
+	char str[sizeof("00000000 ") * 5 + 2 + 1], *p = str;
+  10:	91014ff3 	add	x19, sp, #0x53
+static void __dump_instr(const char *lvl, struct pt_regs *regs)
+  14:	91000294 	add	x20, x20, #0x0
+  18:	a9025bf5 	stp	x21, x22, [sp, #32]
+  1c:	d1004016 	sub	x22, x0, #0x10
+  20:	f9400280 	ldr	x0, [x20]
+  24:	f90047e0 	str	x0, [sp, #136]
+  28:	d2800000 	mov	x0, #0x0                   	// #0
+  2c:	a90363f7 	stp	x23, x24, [sp, #48]
+			p += sprintf(p, i == 0 ? "(%08x) " : "%08x ", val);
+  30:	90000018 	adrp	x24, 0 <__dump_instr.isra.0.constprop.6>
+  34:	90000017 	adrp	x23, 0 <__dump_instr.isra.0.constprop.6>
+  38:	91000318 	add	x24, x24, #0x0
+  3c:	910002f7 	add	x23, x23, #0x0
+static void __dump_instr(const char *lvl, struct pt_regs *regs)
+  40:	a9046bf9 	stp	x25, x26, [sp, #64]
+  44:	aa1303f9 	mov	x25, x19
+	for (i = -4; i < 1; i++) {
+  48:	12800075 	mov	w21, #0xfffffffc            	// #-4
+		bad = get_user(val, &((u32 *)addr)[i]);
+  4c:	5280001a 	mov	w26, #0x0                   	// #0
+  50:	d5384100 	mrs	x0, sp_el0
+	unsigned long ret, limit = current_thread_info()->addr_limit;
+  54:	f9400402 	ldr	x2, [x0, #8]
+	asm volatile(
+  58:	aa1603e0 	mov	x0, x22
+  5c:	aa0203e1 	mov	x1, x2
+  60:	b1001000 	adds	x0, x0, #0x4
+  64:	9a8183e1 	csel	x1, xzr, x1, hi  // hi = pmore
+  68:	da9f3000 	csinv	x0, x0, xzr, cc  // cc = lo, ul, last
+  6c:	fa01001f 	sbcs	xzr, x0, x1
+  70:	9a9f87e0 	cset	x0, ls  // ls = plast
+  74:	b4000260 	cbz	x0, c0 <__dump_instr.isra.0.constprop.6+0xc0>
+	asm volatile(
+  78:	ea2202df 	bics	xzr, x22, x2
+  7c:	9a9f02c1 	csel	x1, x22, xzr, eq  // eq = none
+	csdb();
+  80:	d503229f 	csdb
+	__uaccess_enable(ARM64_ALT_PAN_NOT_UAO);
+  84:	d503201f 	nop
+  88:	2a1a03e0 	mov	w0, w26
+  8c:	b9400022 	ldr	w2, [x1]
+	__uaccess_disable(ARM64_ALT_PAN_NOT_UAO);
+  90:	d503201f 	nop
+		if (!bad)
+  94:	35000160 	cbnz	w0, c0 <__dump_instr.isra.0.constprop.6+0xc0>
+			p += sprintf(p, i == 0 ? "(%08x) " : "%08x ", val);
+  98:	710002bf 	cmp	w21, #0x0
+  9c:	aa1303e0 	mov	x0, x19
+  a0:	9a9802e1 	csel	x1, x23, x24, eq  // eq = none
+	for (i = -4; i < 1; i++) {
+  a4:	110006b5 	add	w21, w21, #0x1
+  a8:	910012d6 	add	x22, x22, #0x4
+			p += sprintf(p, i == 0 ? "(%08x) " : "%08x ", val);
+  ac:	94000000 	bl	0 <sprintf>
+  b0:	8b20c273 	add	x19, x19, w0, sxtw
+	for (i = -4; i < 1; i++) {
+  b4:	710006bf 	cmp	w21, #0x1
+  b8:	54fffcc1 	b.ne	50 <__dump_instr.isra.0.constprop.6+0x50>  // b.any
+  bc:	14000007 	b	d8 <__dump_instr.isra.0.constprop.6+0xd8>
+			p += sprintf(p, "bad PC value");
+  c0:	90000000 	adrp	x0, 0 <__dump_instr.isra.0.constprop.6>
+  c4:	91000000 	add	x0, x0, #0x0
+  c8:	f9400001 	ldr	x1, [x0]
+  cc:	f9000261 	str	x1, [x19]
+  d0:	f8405000 	ldur	x0, [x0, #5]
+  d4:	f8005260 	stur	x0, [x19, #5]
+	printk("%sCode: %s\n", lvl, str);
+  d8:	90000001 	adrp	x1, 0 <__dump_instr.isra.0.constprop.6>
+  dc:	91000021 	add	x1, x1, #0x0
+  e0:	aa1903e2 	mov	x2, x25
+  e4:	90000000 	adrp	x0, 0 <__dump_instr.isra.0.constprop.6>
+  e8:	91000000 	add	x0, x0, #0x0
+  ec:	94000000 	bl	0 <printk>
+}
+  f0:	f94047e1 	ldr	x1, [sp, #136]
+  f4:	f9400280 	ldr	x0, [x20]
+  f8:	ca000020 	eor	x0, x1, x0
+  fc:	b4000040 	cbz	x0, 104 <__dump_instr.isra.0.constprop.6+0x104>
+ 100:	94000000 	bl	0 <__stack_chk_fail>
+ 104:	a94153f3 	ldp	x19, x20, [sp, #16]
+ 108:	a9425bf5 	ldp	x21, x22, [sp, #32]
+ 10c:	a94363f7 	ldp	x23, x24, [sp, #48]
+ 110:	a9446bf9 	ldp	x25, x26, [sp, #64]
+ 114:	a8c97bfd 	ldp	x29, x30, [sp], #144
+ 118:	d65f03c0 	ret
+
+000000000000011c <bad_mode>:
+{
+ 11c:	a9be7bfd 	stp	x29, x30, [sp, #-32]!
+	if (console_loglevel)
+ 120:	90000003 	adrp	x3, 0 <console_printk>
+ 124:	910003fd 	mov	x29, sp
+ 128:	f9000bf3 	str	x19, [sp, #16]
+ 12c:	aa0003f3 	mov	x19, x0
+ 130:	b9400060 	ldr	w0, [x3]
+ 134:	34000060 	cbz	w0, 140 <bad_mode+0x24>
+		console_loglevel = CONSOLE_LOGLEVEL_MOTORMOUTH;
+ 138:	528001e0 	mov	w0, #0xf                   	// #15
+ 13c:	b9000060 	str	w0, [x3]
+	return esr_class_str[ESR_ELx_EC(esr)];
+ 140:	90000000 	adrp	x0, 0 <__dump_instr.isra.0.constprop.6>
+ 144:	91000000 	add	x0, x0, #0x0
+ 148:	9100a005 	add	x5, x0, #0x28
+ 14c:	531a7c46 	lsr	w6, w2, #26
+	pr_crit("Bad mode in %s handler detected on CPU%d, code 0x%08x -- %s\n",
+ 150:	9108a004 	add	x4, x0, #0x228
+ 154:	90000000 	adrp	x0, 0 <cpu_number>
+ 158:	91000000 	add	x0, x0, #0x0
+ 15c:	2a0203e3 	mov	w3, w2
+ 160:	d538d087 	mrs	x7, tpidr_el1
+ 164:	aa0003e2 	mov	x2, x0
+ 168:	90000000 	adrp	x0, 0 <__dump_instr.isra.0.constprop.6>
+ 16c:	b8676842 	ldr	w2, [x2, x7]
+ 170:	91000000 	add	x0, x0, #0x0
+ 174:	f861d881 	ldr	x1, [x4, w1, sxtw #3]
+ 178:	f86678a4 	ldr	x4, [x5, x6, lsl #3]
+ 17c:	94000000 	bl	0 <printk>
+	die("Oops - bad mode", regs, 0);
+ 180:	aa1303e1 	mov	x1, x19
+ 184:	52800002 	mov	w2, #0x0                   	// #0
+ 188:	90000000 	adrp	x0, 0 <__dump_instr.isra.0.constprop.6>
+ 18c:	91000000 	add	x0, x0, #0x0
+ 190:	94000000 	bl	308 <die>
+#define DAIF_PROCCTX_NOIRQ	PSR_I_BIT
+
+/* mask/save/unmask/restore all exceptions, including interrupts. */
+static inline void local_daif_mask(void)
+{
+	asm volatile(
+ 194:	d5034fdf 	msr	daifset, #0xf
+	panic("bad mode");
+ 198:	90000000 	adrp	x0, 0 <__dump_instr.isra.0.constprop.6>
+ 19c:	91000000 	add	x0, x0, #0x0
+ 1a0:	94000000 	bl	0 <panic>
+
+00000000000001a4 <arm64_serror_panic>:
+{
+ 1a4:	a9be7bfd 	stp	x29, x30, [sp, #-32]!
+	if (console_loglevel)
+ 1a8:	90000002 	adrp	x2, 0 <console_printk>
+ 1ac:	910003fd 	mov	x29, sp
+ 1b0:	f9000bf3 	str	x19, [sp, #16]
+ 1b4:	aa0003f3 	mov	x19, x0
+ 1b8:	b9400040 	ldr	w0, [x2]
+ 1bc:	34000060 	cbz	w0, 1c8 <arm64_serror_panic+0x24>
+		console_loglevel = CONSOLE_LOGLEVEL_MOTORMOUTH;
+ 1c0:	528001e0 	mov	w0, #0xf                   	// #15
+ 1c4:	b9000040 	str	w0, [x2]
+	return esr_class_str[ESR_ELx_EC(esr)];
+ 1c8:	90000000 	adrp	x0, 0 <__dump_instr.isra.0.constprop.6>
+ 1cc:	91000000 	add	x0, x0, #0x0
+ 1d0:	9100a000 	add	x0, x0, #0x28
+ 1d4:	531a7c23 	lsr	w3, w1, #26
+	pr_crit("SError Interrupt on CPU%d, code 0x%08x -- %s\n",
+ 1d8:	90000004 	adrp	x4, 0 <cpu_number>
+ 1dc:	2a0103e2 	mov	w2, w1
+ 1e0:	91000084 	add	x4, x4, #0x0
+ 1e4:	d538d081 	mrs	x1, tpidr_el1
+ 1e8:	b8616881 	ldr	w1, [x4, x1]
+ 1ec:	f8637803 	ldr	x3, [x0, x3, lsl #3]
+ 1f0:	90000000 	adrp	x0, 0 <__dump_instr.isra.0.constprop.6>
+ 1f4:	91000000 	add	x0, x0, #0x0
+ 1f8:	94000000 	bl	0 <printk>
+	if (regs)
+ 1fc:	b4000073 	cbz	x19, 208 <arm64_serror_panic+0x64>
+		__show_regs(regs);
+ 200:	aa1303e0 	mov	x0, x19
+ 204:	94000000 	bl	0 <__show_regs>
+	nmi_panic(regs, "Asynchronous SError Interrupt");
+ 208:	90000001 	adrp	x1, 0 <__dump_instr.isra.0.constprop.6>
+ 20c:	aa1303e0 	mov	x0, x19
+ 210:	91000021 	add	x1, x1, #0x0
+ 214:	94000000 	bl	0 <nmi_panic>
+		wfe();
+ 218:	d503205f 	wfe
+		wfi();
+ 21c:	d503207f 	wfi
+ 220:	17fffffe 	b	218 <arm64_serror_panic+0x74>
+
+0000000000000224 <__pte_error>:
+{
+ 224:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+	pr_err("%s:%d: bad pte %016lx.\n", file, line, val);
+ 228:	90000004 	adrp	x4, 0 <__dump_instr.isra.0.constprop.6>
+ 22c:	aa0203e3 	mov	x3, x2
+{
+ 230:	910003fd 	mov	x29, sp
+	pr_err("%s:%d: bad pte %016lx.\n", file, line, val);
+ 234:	2a0103e2 	mov	w2, w1
+ 238:	aa0003e1 	mov	x1, x0
+ 23c:	91000080 	add	x0, x4, #0x0
+ 240:	94000000 	bl	0 <printk>
+}
+ 244:	a8c17bfd 	ldp	x29, x30, [sp], #16
+ 248:	d65f03c0 	ret
+
+000000000000024c <__pmd_error>:
+{
+ 24c:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+	pr_err("%s:%d: bad pmd %016lx.\n", file, line, val);
+ 250:	90000004 	adrp	x4, 0 <__dump_instr.isra.0.constprop.6>
+ 254:	aa0203e3 	mov	x3, x2
+{
+ 258:	910003fd 	mov	x29, sp
+	pr_err("%s:%d: bad pmd %016lx.\n", file, line, val);
+ 25c:	2a0103e2 	mov	w2, w1
+ 260:	aa0003e1 	mov	x1, x0
+ 264:	91000080 	add	x0, x4, #0x0
+ 268:	94000000 	bl	0 <printk>
+}
+ 26c:	a8c17bfd 	ldp	x29, x30, [sp], #16
+ 270:	d65f03c0 	ret
+
+0000000000000274 <__pud_error>:
+{
+ 274:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+	pr_err("%s:%d: bad pud %016lx.\n", file, line, val);
+ 278:	90000004 	adrp	x4, 0 <__dump_instr.isra.0.constprop.6>
+ 27c:	aa0203e3 	mov	x3, x2
+{
+ 280:	910003fd 	mov	x29, sp
+	pr_err("%s:%d: bad pud %016lx.\n", file, line, val);
+ 284:	2a0103e2 	mov	w2, w1
+ 288:	aa0003e1 	mov	x1, x0
+ 28c:	91000080 	add	x0, x4, #0x0
+ 290:	94000000 	bl	0 <printk>
+}
+ 294:	a8c17bfd 	ldp	x29, x30, [sp], #16
+ 298:	d65f03c0 	ret
+
+000000000000029c <__pgd_error>:
+{
+ 29c:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+	pr_err("%s:%d: bad pgd %016lx.\n", file, line, val);
+ 2a0:	90000004 	adrp	x4, 0 <__dump_instr.isra.0.constprop.6>
+ 2a4:	aa0203e3 	mov	x3, x2
+{
+ 2a8:	910003fd 	mov	x29, sp
+	pr_err("%s:%d: bad pgd %016lx.\n", file, line, val);
+ 2ac:	2a0103e2 	mov	w2, w1
+ 2b0:	aa0003e1 	mov	x1, x0
+ 2b4:	91000080 	add	x0, x4, #0x0
+ 2b8:	94000000 	bl	0 <printk>
+}
+ 2bc:	a8c17bfd 	ldp	x29, x30, [sp], #16
+ 2c0:	d65f03c0 	ret
+
+Disassembly of section .fixup:
+
+0000000000000000 <.fixup>:
+   0:	128001a0 	mov	w0, #0xfffffff2            	// #-14
+   4:	d2800002 	mov	x2, #0x0                   	// #0
+   8:	14000000 	b	0 <.fixup>
+   c:	128001a2 	mov	w2, #0xfffffff2            	// #-14
+  10:	14000000 	b	0 <.fixup>
+  14:	128001a2 	mov	w2, #0xfffffff2            	// #-14
+  18:	14000000 	b	0 <.fixup>
+  1c:	128001a2 	mov	w2, #0xfffffff2            	// #-14
+  20:	14000000 	b	0 <.fixup>
+  24:	128001a0 	mov	w0, #0xfffffff2            	// #-14
+  28:	d2800015 	mov	x21, #0x0                   	// #0
+  2c:	14000000 	b	0 <.fixup>
+  30:	128001b6 	mov	w22, #0xfffffff2            	// #-14
+  34:	d2800015 	mov	x21, #0x0                   	// #0
+  38:	14000000 	b	0 <.fixup>
+  3c:	128001b6 	mov	w22, #0xfffffff2            	// #-14
+  40:	d2800001 	mov	x1, #0x0                   	// #0
+  44:	14000000 	b	0 <.fixup>
+  48:	128001a0 	mov	w0, #0xfffffff2            	// #-14
+  4c:	d2800007 	mov	x7, #0x0                   	// #0
+  50:	14000000 	b	0 <.fixup>
+
+Disassembly of section .exception.text:
+
+0000000000000000 <do_undefinstr>:
+{
+   0:	a9ba7bfd 	stp	x29, x30, [sp, #-96]!
+   4:	910003fd 	mov	x29, sp
+   8:	a90153f3 	stp	x19, x20, [sp, #16]
+   c:	90000013 	adrp	x19, 0 <__stack_chk_guard>
+  10:	91000273 	add	x19, x19, #0x0
+  14:	f9400261 	ldr	x1, [x19]
+  18:	f9002fe1 	str	x1, [sp, #88]
+  1c:	d2800001 	mov	x1, #0x0                   	// #0
+  20:	aa0003f4 	mov	x20, x0
+	if (!aarch32_break_handler(regs))
+  24:	94000000 	bl	0 <aarch32_break_handler>
+  28:	35000100 	cbnz	w0, 48 <do_undefinstr+0x48>
+}
+  2c:	f9402fe1 	ldr	x1, [sp, #88]
+  30:	f9400260 	ldr	x0, [x19]
+  34:	ca000020 	eor	x0, x1, x0
+  38:	b5001180 	cbnz	x0, 268 <do_undefinstr+0x268>
+  3c:	a94153f3 	ldp	x19, x20, [sp, #16]
+  40:	a8c67bfd 	ldp	x29, x30, [sp], #96
+  44:	d65f03c0 	ret
+#define SET_IP(regs, val) (GET_IP(regs) = (val))
+#endif
+
+static inline unsigned long instruction_pointer(struct pt_regs *regs)
+{
+	return GET_IP(regs);
+  48:	a9025bf5 	stp	x21, x22, [sp, #32]
+	if (!user_mode(regs)) {
+  4c:	a9500282 	ldp	x2, x0, [x20, #256]
+  50:	f2400c1f 	tst	x0, #0xf
+  54:	54000ee1 	b.ne	230 <do_undefinstr+0x230>  // b.any
+	} else if (compat_thumb_mode(regs)) {
+  58:	37280760 	tbnz	w0, #5, 144 <do_undefinstr+0x144>
+  5c:	d5384100 	mrs	x0, sp_el0
+	unsigned long ret, limit = current_thread_info()->addr_limit;
+  60:	f9400403 	ldr	x3, [x0, #8]
+	asm volatile(
+  64:	aa0203e0 	mov	x0, x2
+  68:	aa0303e1 	mov	x1, x3
+  6c:	b1001000 	adds	x0, x0, #0x4
+  70:	9a8183e1 	csel	x1, xzr, x1, hi  // hi = pmore
+  74:	da9f3000 	csinv	x0, x0, xzr, cc  // cc = lo, ul, last
+  78:	fa01001f 	sbcs	xzr, x0, x1
+  7c:	9a9f87e0 	cset	x0, ls  // ls = plast
+		if (get_user(instr_le, (__le32 __user *)pc))
+  80:	b4000c80 	cbz	x0, 210 <do_undefinstr+0x210>
+	asm volatile(
+  84:	ea23005f 	bics	xzr, x2, x3
+  88:	9a9f0041 	csel	x1, x2, xzr, eq  // eq = none
+	csdb();
+  8c:	d503229f 	csdb
+	__uaccess_enable(ARM64_ALT_PAN_NOT_UAO);
+  90:	d503201f 	nop
+  94:	52800000 	mov	w0, #0x0                   	// #0
+  98:	b9400035 	ldr	w21, [x1]
+	__uaccess_disable(ARM64_ALT_PAN_NOT_UAO);
+  9c:	d503201f 	nop
+  a0:	35000d80 	cbnz	w0, 250 <do_undefinstr+0x250>
+  a4:	f9001bf7 	str	x23, [sp, #48]
+	raw_spin_lock_irqsave(&undef_lock, flags);
+  a8:	90000016 	adrp	x22, 0 <do_undefinstr>
+  ac:	910002d6 	add	x22, x22, #0x0
+  b0:	910042d7 	add	x23, x22, #0x10
+  b4:	aa1703e0 	mov	x0, x23
+  b8:	94000000 	bl	0 <_raw_spin_lock_irqsave>
+	list_for_each_entry(hook, &undef_hook, node)
+  bc:	90000004 	adrp	x4, 0 <do_undefinstr>
+  c0:	91000084 	add	x4, x4, #0x0
+  c4:	f8428c82 	ldr	x2, [x4, #40]!
+  c8:	eb04005f 	cmp	x2, x4
+  cc:	54000980 	b.eq	1fc <do_undefinstr+0x1fc>  // b.none
+	int (*fn)(struct pt_regs *regs, u32 instr) = NULL;
+  d0:	d2800017 	mov	x23, #0x0                   	// #0
+  d4:	14000004 	b	e4 <do_undefinstr+0xe4>
+	list_for_each_entry(hook, &undef_hook, node)
+  d8:	f9400042 	ldr	x2, [x2]
+  dc:	eb04005f 	cmp	x2, x4
+  e0:	540001c0 	b.eq	118 <do_undefinstr+0x118>  // b.none
+		if ((instr & hook->instr_mask) == hook->instr_val &&
+  e4:	29421443 	ldp	w3, w5, [x2, #16]
+  e8:	0a0302a3 	and	w3, w21, w3
+  ec:	6b05007f 	cmp	w3, w5
+  f0:	54ffff41 	b.ne	d8 <do_undefinstr+0xd8>  // b.any
+  f4:	a9419446 	ldp	x6, x5, [x2, #24]
+			(regs->pstate & hook->pstate_mask) == hook->pstate_val)
+  f8:	f9408683 	ldr	x3, [x20, #264]
+  fc:	8a060063 	and	x3, x3, x6
+		if ((instr & hook->instr_mask) == hook->instr_val &&
+ 100:	eb05007f 	cmp	x3, x5
+ 104:	54fffea1 	b.ne	d8 <do_undefinstr+0xd8>  // b.any
+			fn = hook->fn;
+ 108:	f9401457 	ldr	x23, [x2, #40]
+	list_for_each_entry(hook, &undef_hook, node)
+ 10c:	f9400042 	ldr	x2, [x2]
+ 110:	eb04005f 	cmp	x2, x4
+ 114:	54fffe81 	b.ne	e4 <do_undefinstr+0xe4>  // b.any
+	raw_spin_unlock_irqrestore(&undef_lock, flags);
+ 118:	aa0003e1 	mov	x1, x0
+ 11c:	910042c0 	add	x0, x22, #0x10
+ 120:	94000000 	bl	0 <_raw_spin_unlock_irqrestore>
+	return fn ? fn(regs, instr) : 1;
+ 124:	b4000737 	cbz	x23, 208 <do_undefinstr+0x208>
+ 128:	2a1503e1 	mov	w1, w21
+ 12c:	aa1403e0 	mov	x0, x20
+ 130:	d63f02e0 	blr	x23
+	if (call_undef_hook(regs) == 0)
+ 134:	350006a0 	cbnz	w0, 208 <do_undefinstr+0x208>
+ 138:	a9425bf5 	ldp	x21, x22, [sp, #32]
+ 13c:	f9401bf7 	ldr	x23, [sp, #48]
+ 140:	17ffffbb 	b	2c <do_undefinstr+0x2c>
+ 144:	f9001bf7 	str	x23, [sp, #48]
+	asm volatile(
+ 148:	aa0203e0 	mov	x0, x2
+ 14c:	d5384117 	mrs	x23, sp_el0
+	unsigned long ret, limit = current_thread_info()->addr_limit;
+ 150:	f94006e3 	ldr	x3, [x23, #8]
+	asm volatile(
+ 154:	aa0303e1 	mov	x1, x3
+ 158:	b1000800 	adds	x0, x0, #0x2
+ 15c:	9a8183e1 	csel	x1, xzr, x1, hi  // hi = pmore
+ 160:	da9f3000 	csinv	x0, x0, xzr, cc  // cc = lo, ul, last
+ 164:	fa01001f 	sbcs	xzr, x0, x1
+ 168:	9a9f87e0 	cset	x0, ls  // ls = plast
+		if (get_user(instr_le, (__le16 __user *)pc))
+ 16c:	b4000760 	cbz	x0, 258 <do_undefinstr+0x258>
+	asm volatile(
+ 170:	ea23005f 	bics	xzr, x2, x3
+ 174:	9a9f0040 	csel	x0, x2, xzr, eq  // eq = none
+	csdb();
+ 178:	d503229f 	csdb
+	__uaccess_enable(ARM64_ALT_PAN_NOT_UAO);
+ 17c:	d503201f 	nop
+ 180:	52800016 	mov	w22, #0x0                   	// #0
+ 184:	79400015 	ldrh	w21, [x0]
+	__uaccess_disable(ARM64_ALT_PAN_NOT_UAO);
+ 188:	d503201f 	nop
+ 18c:	350003f6 	cbnz	w22, 208 <do_undefinstr+0x208>
+		instr = le16_to_cpu(instr_le);
+ 190:	12003eb5 	and	w21, w21, #0xffff
+		if (aarch32_insn_is_wide(instr)) {
+ 194:	f90027e2 	str	x2, [sp, #72]
+ 198:	2a1503e0 	mov	w0, w21
+ 19c:	94000000 	bl	0 <aarch32_insn_is_wide>
+ 1a0:	72001c1f 	tst	w0, #0xff
+ 1a4:	54fff820 	b.eq	a8 <do_undefinstr+0xa8>  // b.none
+			if (get_user(instr_le, (__le16 __user *)(pc + 2)))
+ 1a8:	f94027e2 	ldr	x2, [sp, #72]
+	unsigned long ret, limit = current_thread_info()->addr_limit;
+ 1ac:	f94006e3 	ldr	x3, [x23, #8]
+ 1b0:	91000842 	add	x2, x2, #0x2
+	asm volatile(
+ 1b4:	aa0203e0 	mov	x0, x2
+ 1b8:	aa0303e1 	mov	x1, x3
+ 1bc:	b1000800 	adds	x0, x0, #0x2
+ 1c0:	9a8183e1 	csel	x1, xzr, x1, hi  // hi = pmore
+ 1c4:	da9f3000 	csinv	x0, x0, xzr, cc  // cc = lo, ul, last
+ 1c8:	fa01001f 	sbcs	xzr, x0, x1
+ 1cc:	9a9f87e0 	cset	x0, ls  // ls = plast
+ 1d0:	b40001c0 	cbz	x0, 208 <do_undefinstr+0x208>
+	asm volatile(
+ 1d4:	ea23005f 	bics	xzr, x2, x3
+ 1d8:	9a9f0040 	csel	x0, x2, xzr, eq  // eq = none
+	csdb();
+ 1dc:	d503229f 	csdb
+	__uaccess_enable(ARM64_ALT_PAN_NOT_UAO);
+ 1e0:	d503201f 	nop
+ 1e4:	79400001 	ldrh	w1, [x0]
+	__uaccess_disable(ARM64_ALT_PAN_NOT_UAO);
+ 1e8:	d503201f 	nop
+ 1ec:	350000f6 	cbnz	w22, 208 <do_undefinstr+0x208>
+			instr2 = le16_to_cpu(instr_le);
+ 1f0:	12003c21 	and	w1, w1, #0xffff
+			instr = (instr << 16) | instr2;
+ 1f4:	2a154035 	orr	w21, w1, w21, lsl #16
+ 1f8:	17ffffac 	b	a8 <do_undefinstr+0xa8>
+	raw_spin_unlock_irqrestore(&undef_lock, flags);
+ 1fc:	aa0003e1 	mov	x1, x0
+ 200:	aa1703e0 	mov	x0, x23
+ 204:	94000000 	bl	0 <_raw_spin_unlock_irqrestore>
+	return fn ? fn(regs, instr) : 1;
+ 208:	f9401bf7 	ldr	x23, [sp, #48]
+ 20c:	f9408282 	ldr	x2, [x20, #256]
+	force_signal_inject(SIGILL, ILL_ILLOPC, regs->pc);
+ 210:	52800080 	mov	w0, #0x4                   	// #4
+ 214:	52800021 	mov	w1, #0x1                   	// #1
+ 218:	94000000 	bl	7e0 <force_signal_inject>
+	BUG_ON(!user_mode(regs));
+ 21c:	f9408680 	ldr	x0, [x20, #264]
+ 220:	f2400c1f 	tst	x0, #0xf
+ 224:	540001e1 	b.ne	260 <do_undefinstr+0x260>  // b.any
+ 228:	a9425bf5 	ldp	x21, x22, [sp, #32]
+ 22c:	17ffff80 	b	2c <do_undefinstr+0x2c>
+		if (probe_kernel_address((__force __le32 *)pc, instr_le))
+ 230:	aa0203e1 	mov	x1, x2
+ 234:	910153e0 	add	x0, sp, #0x54
+ 238:	d2800082 	mov	x2, #0x4                   	// #4
+ 23c:	94000000 	bl	0 <probe_kernel_read>
+ 240:	b5000080 	cbnz	x0, 250 <do_undefinstr+0x250>
+		instr = le32_to_cpu(instr_le);
+ 244:	b94057f5 	ldr	w21, [sp, #84]
+ 248:	f9001bf7 	str	x23, [sp, #48]
+ 24c:	17ffff97 	b	a8 <do_undefinstr+0xa8>
+ 250:	f9408282 	ldr	x2, [x20, #256]
+ 254:	17ffffef 	b	210 <do_undefinstr+0x210>
+ 258:	f9401bf7 	ldr	x23, [sp, #48]
+ 25c:	17ffffed 	b	210 <do_undefinstr+0x210>
+ 260:	f9001bf7 	str	x23, [sp, #48]
+	BUG_ON(!user_mode(regs));
+ 264:	d4210000 	brk	#0x800
+ 268:	a9025bf5 	stp	x21, x22, [sp, #32]
+ 26c:	f9001bf7 	str	x23, [sp, #48]
+}
+ 270:	94000000 	bl	0 <__stack_chk_fail>
+ 274:	d503201f 	nop
+
+0000000000000278 <do_sysinstr>:
+	for (hook = sys64_hooks; hook->handler; hook++)
+ 278:	90000003 	adrp	x3, 0 <do_undefinstr>
+ 27c:	91000063 	add	x3, x3, #0x0
+ 280:	9100e062 	add	x2, x3, #0x38
+{
+ 284:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+ 288:	910003fd 	mov	x29, sp
+	for (hook = sys64_hooks; hook->handler; hook++)
+ 28c:	f9400444 	ldr	x4, [x2, #8]
+ 290:	b40001c4 	cbz	x4, 2c8 <do_sysinstr+0x50>
+		if ((hook->esr_mask & esr) == hook->esr_val) {
+ 294:	b9403863 	ldr	w3, [x3, #56]
+ 298:	b9400445 	ldr	w5, [x2, #4]
+ 29c:	0a030003 	and	w3, w0, w3
+ 2a0:	6b05007f 	cmp	w3, w5
+ 2a4:	540000c1 	b.ne	2bc <do_sysinstr+0x44>  // b.any
+ 2a8:	1400000c 	b	2d8 <do_sysinstr+0x60>
+ 2ac:	29401443 	ldp	w3, w5, [x2]
+ 2b0:	0a030003 	and	w3, w0, w3
+ 2b4:	6b05007f 	cmp	w3, w5
+ 2b8:	54000100 	b.eq	2d8 <do_sysinstr+0x60>  // b.none
+	for (hook = sys64_hooks; hook->handler; hook++)
+ 2bc:	91004042 	add	x2, x2, #0x10
+ 2c0:	f9400444 	ldr	x4, [x2, #8]
+ 2c4:	b5ffff44 	cbnz	x4, 2ac <do_sysinstr+0x34>
+	do_undefinstr(regs);
+ 2c8:	aa0103e0 	mov	x0, x1
+ 2cc:	94000000 	bl	0 <do_undefinstr>
+}
+ 2d0:	a8c17bfd 	ldp	x29, x30, [sp], #16
+ 2d4:	d65f03c0 	ret
+			hook->handler(esr, regs);
+ 2d8:	d63f0080 	blr	x4
+}
+ 2dc:	a8c17bfd 	ldp	x29, x30, [sp], #16
+ 2e0:	d65f03c0 	ret
+
+Disassembly of section .init.text:
+
+0000000000000000 <early_brk64>:
+ * Initial handler for AArch64 BRK exceptions
+ * This handler only used until debug_traps_init().
+ */
+int __init early_brk64(unsigned long addr, unsigned int esr,
+		struct pt_regs *regs)
+{
+   0:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+	return bug_handler(regs, esr) != DBG_HOOK_HANDLED;
+   4:	aa0203e0 	mov	x0, x2
+{
+   8:	910003fd 	mov	x29, sp
+	return bug_handler(regs, esr) != DBG_HOOK_HANDLED;
+   c:	94000000 	bl	0 <early_brk64>
+  10:	7100001f 	cmp	w0, #0x0
+}
+  14:	1a9f07e0 	cset	w0, ne  // ne = any
+  18:	a8c17bfd 	ldp	x29, x30, [sp], #16
+  1c:	d65f03c0 	ret
+
+0000000000000020 <trap_init>:
+
+/* This registration must happen early, before debug_traps_init(). */
+void __init trap_init(void)
+{
+  20:	a9bf7bfd 	stp	x29, x30, [sp, #-16]!
+	register_break_hook(&bug_break_hook);
+  24:	90000000 	adrp	x0, 0 <early_brk64>
+  28:	91000000 	add	x0, x0, #0x0
+{
+  2c:	910003fd 	mov	x29, sp
+	register_break_hook(&bug_break_hook);
+  30:	91022000 	add	x0, x0, #0x88
+  34:	94000000 	bl	0 <register_break_hook>
+}
+  38:	a8c17bfd 	ldp	x29, x30, [sp], #16
+  3c:	d65f03c0 	ret

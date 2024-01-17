@@ -1,0 +1,75 @@
+uuu_version 1.2.39
+
+# Please Replace below items with actually file names
+# @flash.bin			| boot loader
+# @Image			| kernel image, arm64 is Image, arm32 it is zImage
+# @fsl-imx8mq-evk.dtb			| board dtb file
+# @fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot	| mfgtool init ramfs
+# @ubuntu-imx.wic		| rootfs
+# @_uTee.tar			| optee image, put dummy _uTee.tar file here if platform is not MX6/MX7*
+
+# This command will be run when i.MX6/7 i.MX8MM, i.MX8MQ
+SDP: boot -f flash.bin
+
+# This command will be run when ROM support stream mode
+# i.MX8QXP, i.MX8QM
+SDPS: boot -f flash.bin
+
+# These commands will be run when use SPL and will be skipped if no spl
+# SDPU will be deprecated. please use SDPV instead of SDPU
+# {
+SDPU: delay 1000
+SDPU: write -f flash.bin -offset 0x57c00
+SDPU: jump
+# }
+
+# These commands will be run when use SPL and will be skipped if no spl
+# if (SPL support SDPV)
+# {
+SDPV: delay 1000
+SDPV: write -f flash.bin -skipspl
+SDPV: jump
+# }
+
+# use uboot burn bootloader to eMMC
+# becaue difference chip, offset is difference
+# you can use kernel to do that for specific boards
+FB: ucmd setenv fastboot_dev mmc
+FB: ucmd setenv mmcdev ${emmc_dev}
+FB: flash bootloader flash.bin
+
+FB: ucmd if env exists emmc_ack; then ; else setenv emmc_ack 0; fi;
+
+FB: ucmd setenv emmc_cmd mmc partconf ${emmc_dev} ${emmc_ack} 1 0
+FB: ucmd if test "${emmc_skip_fb}" != "yes"; then run emmc_cmd; fi
+FB: ucmd setenv emmc_cmd mmc bootbus ${emmc_dev} 2 2 1;
+FB: ucmd if test "${emmc_skip_fb}" != "yes"; then run emmc_cmd; fi
+
+FB: ucmd setenv fastboot_buffer ${loadaddr}
+FB: download -f Image
+FB: ucmd setenv fastboot_buffer ${fdt_addr}
+FB: download -f fsl-imx8mq-evk.dtb
+FB: ucmd setenv fastboot_buffer ${initrd_addr}
+FB: download -f fsl-image-mfgtool-initramfs-imx_mfgtools.cpio.gz.u-boot
+FB: ucmd setenv bootargs console=${console},${baudrate} earlycon=${earlycon},${baudrate}
+FB: acmd ${kboot} ${loadaddr} ${initrd_addr} ${fdt_addr}
+
+# get mmc dev number from kernel command line
+# Wait for emmc
+FBK: ucmd while [ ! -e /dev/mmcblk*boot0 ]; do sleep 1; echo "wait for /dev/mmcblk*boot* appear"; done;
+
+# serach emmc device number, if your platform have more than two emmc chip, please echo dev number >/tmp/mmcdev 
+FBK: ucmd dev=`ls /dev/mmcblk*boot*`; dev=($dev); dev=${dev[0]}; dev=${dev#/dev/mmcblk}; dev=${dev%boot*}; echo $dev > /tmp/mmcdev;
+
+
+FBK: ucmd sync
+
+FBK: ucmd mmc=`cat /tmp/mmcdev`; while [ ! -e /dev/mmcblk${mmc}p1 ]; do sleep 1; done
+
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mkdir -p /mnt/fat
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mount -t vfat /dev/mmcblk${mmc}p1 /mnt/fat
+FBK: ucp  Image t:/mnt/fat
+FBK: ucp  fsl-imx8mq-evk.dtb t:/mnt/fat
+
+FBK: DONE
+

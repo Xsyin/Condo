@@ -1,0 +1,2 @@
+#define MKIMAGE_COMMIT 0x92d0bc17
+
