@@ -86,8 +86,10 @@ int cap_capable(const struct cred *cred, struct user_namespace *targ_ns,
 		 * If we're already at a lower level than we're looking for,
 		 * we're done searching.
 		 */
-		if (ns->level <= cred->user_ns->level)
+		if (ns->level <= cred->user_ns->level){
+			// pr_alert("%s: current %s, ns %#lx, parent %#lx, ns->level %d, cred %#lx, cred->user_ns %#lx, level %d", __func__, current->comm, ns, ns->parent, ns->level, cred, cred->user_ns, cred->user_ns->level);
 			return -EPERM;
+		}
 
 		/* 
 		 * The owner of the user namespace in the parent of the

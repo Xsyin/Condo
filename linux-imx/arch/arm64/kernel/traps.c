@@ -35,6 +35,7 @@
 #include <linux/sizes.h>
 #include <linux/syscalls.h>
 #include <linux/mm_types.h>
+#include <linux/init_task.h>
 #include <linux/trust_container.h>
 
 #include <asm/atomic.h>
@@ -638,8 +639,13 @@ asmlinkage void bad_el0_sync(struct pt_regs *regs, int reason, unsigned int esr)
 	arm64_force_sig_info(&info, "Bad EL0 synchronous exception", current);
 }
 
+int first_detect_flag = 0;
+u64 first_detect_time = 0;
+u64 after_attack_time = 0;
+
 asmlinkage void user_enter_check(void)
-{
+{	
+
 #ifdef COUNT_SWITCH_INTERVAL
 	unsigned long now;
 	switch_count_a++;
@@ -652,16 +658,13 @@ asmlinkage void user_enter_check(void)
 #endif
 
 #ifdef CONTAINER_FLUSH_NULL
-	static long usr_enter;
-	polling_checker(current);
+	if(is_container)
+		polling_checker();
 
 	// if(is_container && (current->nsproxy == container_ns) && !current->cred->uid.val)
 	// 	pr_alert("%s: user_enter current %s, nsproxy %#lx,  cred %#lx, uid %d, euid %d, cap %x", __func__, current->comm, current->nsproxy, current->cred, current_cred()->uid.val, current_cred()->euid.val, current_cap());
 
 	if(in_container_range(current->nsproxy, NSPROXY)){
-		// usr_enter++;
-		// // if(usr_enter % 1000 == 0)
-		// 	pr_alert("%s: container exit kernel count %ld", __func__, usr_enter);
 		current->nsproxy = (struct nsproxy *)mask_con_value(NSPROXY, current->nsproxy);
 	}
 			
@@ -670,9 +673,12 @@ asmlinkage void user_enter_check(void)
 
 	if(in_container_range(current->fs, FS))
 		current->fs = (struct fs_struct *)mask_con_value(FS, current->fs);
-		
+
 #endif
 }
+
+unsigned long switch_count_b = 0;
+u64 switch_time_b = 0;
 
 asmlinkage void user_exit_check(void)
 {
@@ -689,28 +695,8 @@ asmlinkage void user_exit_check(void)
 #endif
 
 #ifdef CONTAINER_FLUSH_NULL
-	static long usr_exit;
-	polling_checker(current);
-
-	// if(is_container && (current->nsproxy == container_ns) && !current->cred->uid.val)
-	// 	pr_alert("%s: user_exit current %s, nsproxy %#lx,  cred %#lx, uid %d, euid %d, cap %x", __func__, current->comm, current->nsproxy, current->cred, current_cred()->uid.val, current_cred()->euid.val, current_cap());
-
-	if((in_container_range(current->nsproxy, NSPROXY)) || in_container_range(current->cred, CRED) || in_container_range(current->fs, FS))
-	{
-		pr_alert("%s: there is something error!, current->nsproxy %#lx, current->cred %#lx, current->fs %#lx", __func__, current->nsproxy, current->cred, current->fs);
-	// 	// if(in_container_range(current->cred, CRED))
-	// 	// 	current->cred = mask_con_value(CRED, current);
-
-	// 	// current->nsproxy = mask_con_value(NSPROXY, 0, current);
-	// 	current->nsproxy = (struct nsproxy *)mask_con_value(NSPROXY, current->nsproxy);
-
-	}
-	// if((get_flag(current->nsproxy) == CONTAINER_NSPROXY) || (get_flag(current->cred) == CONTAINER_CRED) || (get_flag(current->fs) == CONTAINER_FS))
-	// {
-	// 	usr_exit++;
-	// 	// if(usr_exit % 1000 == 0)
-	// 		pr_alert("%s: container enter kernel count %ld", __func__, usr_exit);
-	// }
+	if(is_container)
+		polling_checker();
 #endif
 }
 

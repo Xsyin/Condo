@@ -662,20 +662,18 @@ const struct cred *override_creds(const struct cred *new)
 		// current cred is not in safe region
 		// if(current->cred->uid.val == 0 && old->uid.val != 0)
         //     pr_alert("%s: RET_IP %#lx, task %#lx, %s, nsproxy %#lx, cred %#lx, uid %d, euid %d, cap %#lx, old %#lx, uid %d, cap %#lx", __func__, _RET_IP_, current, current->comm, current->nsproxy, current->cred, current->cred->uid.val, current->cred->euid.val, current->cred->cap_effective, old, old->uid.val, old->cap_effective);
-		// if(!in_container_range(current->cred, CRED) && (get_flag(current->cred) != CONTAINER_CRED)){
-		// 	// create new cred in safe region OR if cred is already in safe region, change current->cred to it
-		// 	if(!copy_container_data_to_region(current, CONTAINER_CRED))
-		// 		pr_alert("%s: override cred error!",__func__);
+		if(!in_container_range(current->cred, CRED) && (get_flag(current->cred) != CONTAINER_CRED)){
+			// create new cred in safe region OR if cred is already in safe region, change current->cred to it
+			if(!copy_container_data_to_region(current, CONTAINER_CRED))
+				pr_alert("%s: override cred error!",__func__);
 
-		// }
+		}
 		// pr_alert("%s: 111111 RET_IP: %#lx, current %#lx, old %#lx, uid %d, new %#lx, uid %d, current->cred %#lx, usage %d",__func__, _RET_IP_, current, old, old->uid.val, new, new->uid.val, current->cred, atomic_read(&(current->cred)->usage));
 		if(current->cred->uid.val == 0 && old->uid.val != 0){
 			container_cred = current->cred;
             pr_alert_once("%s: RET_IP %#lx, task %#lx, %s, nsproxy %#lx, container_cred %#lx, cred %#lx, uid %d, euid %d, cap %#lx, old %#lx, uid %d, cap %#lx", __func__, _RET_IP_, current, current->comm, current->nsproxy, container_cred, current->cred, current->cred->uid.val, current->cred->euid.val, current->cred->cap_effective, old, old->uid.val, old->cap_effective);
 
 		}
-		// if(atomic_read(&(current->cred)->usage) > 1000)
-			// pr_alert("%s: 2222222 RET_IP: %#lx, current %#lx, old %#lx, usage %d, new %#lx, usage %d, current->cred %#lx, usage %d",__func__, _RET_IP_, current, old, atomic_read(&old->usage), new, atomic_read(&new->usage), current->cred, atomic_read(&(current->cred)->usage));
 
 	} 
 #endif
@@ -708,12 +706,12 @@ void revert_creds(const struct cred *old)
 	if((in_container_range(current->nsproxy, NSPROXY) || get_flag(current->nsproxy) == CONTAINER_NSPROXY)){
 		// current cred is not in safe region
 		
-		// if(!in_container_range(current->cred, CRED) && (get_flag(current->cred) != CONTAINER_CRED)){
-		// 	// create new cred in safe region OR cred is already in safe region, change current->cred to it
-		// 	if(!copy_container_data_to_region(current, CONTAINER_CRED))
-		// 		pr_alert("%s: revert cred error!",__func__);
+		if(!in_container_range(current->cred, CRED) && (get_flag(current->cred) != CONTAINER_CRED)){
+			// create new cred in safe region OR cred is already in safe region, change current->cred to it
+			if(!copy_container_data_to_region(current, CONTAINER_CRED))
+				pr_alert("%s: revert cred error!",__func__);
 
-		// }
+		}
 		// pr_alert("%s: old tihuan override RET_IP: %#lx, current %#lx, old %#lx, usage %d, override %#lx, usage %d, current->cred %#lx, usage %d",__func__, _RET_IP_, current, old, atomic_read(&old->usage), override, atomic_read(&override->usage), current->cred, atomic_read(&(current->cred)->usage));
 		
 	}

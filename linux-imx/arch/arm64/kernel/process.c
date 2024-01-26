@@ -60,6 +60,7 @@
 #include <asm/stacktrace.h>
 
 #include <linux/trust_container.h>
+#include <linux/init_task.h>
 
 #ifdef CONFIG_STACKPROTECTOR
 #include <linux/stackprotector.h>
@@ -417,6 +418,51 @@ static void entry_task_switch(struct task_struct *next)
 unsigned long switch_count_a = 0;
 u64 switch_time_a = 0;
 #endif
+
+int polling_checker(void){
+	struct task_struct *cpu_curr;
+	int cpu;
+	u64 now;
+	//check each cpu running process
+	// get each cpu running process
+	for_each_online_cpu(cpu) {
+		cpu_curr = per_cpu(__entry_task, cpu);
+		// check pointer
+		if(is_container &&  (in_container_range(cpu_curr->nsproxy, NSPROXY) || (get_flag(cpu_curr->nsproxy) == CONTAINER_NSPROXY)) &&  in_container_range(cpu_curr->cred->user_ns, USER_NS)){
+			if(!(in_container_range(cpu_curr->cred, CRED) || (get_flag(cpu_curr->cred) == CONTAINER_CRED)))
+				pr_alert("%s: process %s cred alert!", __func__, cpu_curr->comm);
+			if(!(in_container_range(cpu_curr->fs, FS) || (get_flag(cpu_curr->fs) == CONTAINER_FS)))
+				pr_alert("%s: process %s fs alert!", __func__, cpu_curr->comm);
+		}
+		// if(is_container &&  in_container_range(cpu_curr->nsproxy, NSPROXY) || (get_flag(cpu_curr->nsproxy) == CONTAINER_NSPROXY)){
+		// if(is_container &&  in_container_range(cpu_curr->nsproxy, NSPROXY) || (get_flag(cpu_curr->nsproxy) == CONTAINER_NSPROXY)){
+			// attack inspector
+			// if(!cpu_curr->cred->uid.val || (cpu_curr->nsproxy == &init_nsproxy))
+		if((cpu_curr->cred == &init_cred) || (cpu_curr->nsproxy == &init_nsproxy)){
+			// if(memcmp(cpu_curr->comm, "try_mknod", 9) == 0){
+			// if(memcmp(cpu_curr->comm, "try_insmod", 10) == 0){
+			if(memcmp(cpu_curr->comm, "try_writepasswd", 15) == 0){
+				now = ktime_get_ns();
+				if(!first_detect_flag){
+					first_detect_time = now;
+					first_detect_flag = 1;
+					pr_alert("%s: RET_IP %#lx, current %s, already be attacked!!!! now %llu, first_detect_time %llu", __func__, _RET_IP_, current->comm, now, first_detect_time);
+
+				}
+				if(attack_flag){
+					after_attack_time = now;
+					first_detect_flag = 0;
+					attack_flag = 0;
+					pr_alert("%s: RET_IP %#lx, current %s, after attack first detect time %llu, attack time %llu, after attack switch time %llu", __func__, _RET_IP_, current->comm, first_detect_time, attack_time, after_attack_time);
+				}
+				pr_alert("%s: RET_IP %#lx, current %s, cpu %d, cpu_curr %s", __func__, _RET_IP_, current->comm, cpu, cpu_curr->comm);
+				force_sig(SIGKILL,cpu_curr);
+				// pr_alert("%s: RET_IP %#lx, alert !!! now %llu, current %#lx, current->on_cpu %d, cpu %d, cpu_curr %#lx, %s ns %#lx, cred %#lx, fs %#lx ....................", __func__, _RET_IP_, now, current, current->on_cpu, cpu, cpu_curr, cpu_curr->comm, cpu_curr->nsproxy, cpu_curr->cred, cpu_curr->fs);
+			}
+		}
+		// }
+	}
+}
 /*
  * Thread switching.
  */
@@ -424,25 +470,11 @@ __notrace_funcgraph struct task_struct *__switch_to(struct task_struct *prev,
 				struct task_struct *next)
 {
 	struct task_struct *last;
-	struct task_struct *cpu_curr;
-	int cpu;
 	//process switch hook, add by yin
 #ifdef CONTAINER_FLUSH_NULL
-	polling_checker(prev);
-	// if(is_container && in_container_range(prev->cred->user_ns, USER_NS) && !prev->cred->uid.val)
-	// 	pr_alert("%s: prev %s, nsproxy %#lx, cred %#lx, pa %#lx, uid %d, euid %d, cap %lx", __func__, prev->comm, prev->nsproxy, prev->cred, __pa(prev->cred), prev->cred->uid.val, prev->cred->euid.val, prev->cred->cap_effective);
+	if(is_container)
+		polling_checker();
 	
-	// check each cpu running process
-	// if(is_container &&  in_container_range(prev->nsproxy, NSPROXY) || (get_flag(prev->nsproxy) == CONTAINER_NSPROXY) || in_container_range(prev->cred->user_ns, USER_NS)){
-	// 	// get each cpu running process
-	// 	for_each_online_cpu(cpu) {
-	// 		cpu_curr = per_cpu(__entry_task, cpu);
-	// 		if(is_container &&  in_container_range(cpu_curr->nsproxy, NSPROXY) || (get_flag(cpu_curr->nsproxy) == CONTAINER_NSPROXY) || in_container_range(cpu_curr->cred->user_ns, USER_NS)){
-	// 			if(!cpu_curr->cred->uid.val || (cpu_curr->nsproxy == &init_nsproxy))
-	// 				pr_alert("%s: alert !!! current %#lx, current->on_cpu %d, prev %#lx, prev->on_cpu %d, cpu %d, cpu_curr %#lx,  ns %#lx, cred %#lx, fs %#lx ....................", __func__, current, current->on_cpu, prev, prev->on_cpu, cpu, cpu_curr, cpu_curr->nsproxy, cpu_curr->cred, cpu_curr->fs);
-	// 		}
-	// 	}
-	// }
 	if(in_container_range(prev->nsproxy, NSPROXY)){
 
 		prev->nsproxy = (struct nsproxy *)mask_con_value(NSPROXY, prev->nsproxy);

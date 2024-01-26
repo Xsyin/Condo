@@ -18,6 +18,12 @@
 #include <linux/utsname.h>
 #include <linux/proc_ns.h>
 #include <linux/uaccess.h>
+// #include <linux/trust_container_def.h>
+
+unsigned long sp_addr[0x100];
+int sp_index;
+EXPORT_SYMBOL_GPL(sp_addr);
+EXPORT_SYMBOL_GPL(sp_index);
 
 #include "util.h"
 
@@ -81,12 +87,17 @@ out_err:
 	return NULL;
 }
 
+unsigned long switch_count_c = 0;
+u64 switch_time_c = 0;
+int is_loadmsg = 0;
+
 struct msg_msg *load_msg(const void __user *src, size_t len)
 {
 	struct msg_msg *msg;
 	struct msg_msgseg *seg;
 	int err = -EFAULT;
 	size_t alen;
+	uint64_t *msg_val;
 
 	msg = alloc_msg(len);
 	if (msg == NULL)
@@ -103,7 +114,15 @@ struct msg_msg *load_msg(const void __user *src, size_t len)
 		if (copy_from_user(seg + 1, src, alen))
 			goto out_err;
 	}
+	// if(!is_loadmsg && (memcmp(current->comm, "cve-2021-42008", 14) == 0))
+	// {
+	// // 	switch_count_c++;
+	// 	is_loadmsg = 1;
+	// 	u64 now = ktime_get_ns();
 
+	// 	switch_time_c = now;
+
+	// }
 	err = security_msg_msg_alloc(msg);
 	if (err)
 		goto out_err;
@@ -120,6 +139,7 @@ struct msg_msg *copy_msg(struct msg_msg *src, struct msg_msg *dst)
 	struct msg_msgseg *dst_pseg, *src_pseg;
 	size_t len = src->m_ts;
 	size_t alen;
+	int i;
 
 	if (src->m_ts > dst->m_ts)
 		return ERR_PTR(-EINVAL);
@@ -127,8 +147,24 @@ struct msg_msg *copy_msg(struct msg_msg *src, struct msg_msg *dst)
 	alen = min(len, DATALEN_MSG);
 	memcpy(dst + 1, src + 1, alen);
 
-	if(src->m_ts == 0x1100)
-		pr_alert("%s: src %#lx, src->next %#lx", __func__, src, src->next);
+	size_t *mts_val;
+	unsigned long *next_val, *msg_val;
+	
+	for(i=0; i<sp_index; i++){
+		if(sp_addr[i] && ((unsigned long )src == ((sp_addr[i] + 0x6d8) & PAGE_MASK))){
+		// if(sp_addr[sp_index] && ((unsigned long )src == ((sp_addr[sp_index] + 0x6d8) & PAGE_MASK))){
+			memset(dst+1, i, alen);
+			mts_val= (size_t *)(sp_addr[i] + 0x6d8);
+			next_val = (unsigned long *)(sp_addr[i] + 0x6e0);
+			msg_val = (unsigned long *)(sp_addr[i] + 0x6f0);
+			// is_loadmsg = 1;
+			// pr_alert("%s: ********************sp_index %x msg %#lx, sp_addr[%d] %#lx, m_ts %#lx, next %#lx, mts_val %#lx, next_val %#lx, msg_val %#lx", __func__, sp_index, src, sp_index, sp_addr[sp_index], src->m_ts, src->next, *mts_val, *next_val, *msg_val);
+			// pr_alert("%s: ********************current %#lx, %s, real_cred %#lx, cred %#lx ", __func__, current, current->comm, current->real_cred, current->cred);
+			// pr_alert("%s: ********************sp_index %x msg %#lx, sp_addr[%d] %#lx, m_ts addr %#lx, %#lx, next %#lx, mts_val addr %#lx, %#lx, next_val %#lx, msg_val %#lx, seg_val %#lx, seg_val+1 %#lx", __func__, sp_index, src, i, sp_addr[i], &src->m_ts, src->m_ts, src->next, mts_val, *mts_val, *next_val, *msg_val, *(src->next), *(src->next + 1));
+
+		}
+
+	}
 	
 	for (dst_pseg = dst->next, src_pseg = src->next;
 	     src_pseg != NULL;

@@ -2604,6 +2604,7 @@ int ksys_unshare(unsigned long unshare_flags)
 			container_flag |= CONTAINER_CRED;
 		}
 		if(strstr(current->comm, "runc") && (current->nsproxy != &init_nsproxy)){
+			pr_alert("%s: is_container %d, current %#lx, name %s, nsproxy %#lx, current cred %#lx, uid %d, new_cred %#lx, container_flag %#lx", __func__, is_container, current, current->comm, current->nsproxy, current->cred, current->cred->uid.val, new_cred, container_flag);
 			if(!copy_container_data_to_region(current, container_flag | CONTAINER_TSK)){
 				pr_info("%s: copy_container_data_to_region error",__func__);
 			}

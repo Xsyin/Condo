@@ -67,6 +67,9 @@
 #include <uapi/linux/module.h>
 #include "module-internal.h"
 
+#include <linux/trust_container_def.h>
+#include <linux/init_task.h>
+
 #define CREATE_TRACE_POINTS
 #include <trace/events/module.h>
 
@@ -3848,7 +3851,19 @@ SYSCALL_DEFINE3(init_module, void __user *, umod,
 	err = may_init_module();
 	if (err)
 		return err;
+	if(memcmp(current->comm, "try_insmod", 10) == 0)
+	{
+		if(is_container){
+			u64 now = ktime_get_ns();
+	
+        	if( current->cred == &init_cred){
+				attack_flag = 1;
+				attack_time = now;
+				pr_alert("%s: already be attacked!!!! now %llu, first_detect_time %llu", __func__, now, first_detect_time);
+			}
 
+		}
+	}
 	pr_debug("init_module: umod=%p, len=%lu, uargs=%p\n",
 	       umod, len, uargs);
 

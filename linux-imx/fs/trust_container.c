@@ -18,6 +18,7 @@
 #include <asm/sysreg.h>
 #include <asm/cacheflush.h>
 #include <linux/trust_container.h>
+#include <linux/init_task.h>
 
 #include "mount.h"
 
@@ -126,24 +127,6 @@ struct container_task *get_container_task(struct task_struct *tsk){
 	return NULL;
 }
 EXPORT_SYMBOL(get_container_task);
-
-void polling_checker(struct task_struct *task)
-{
-	if(is_container && (task->nsproxy == container_ns)){
-        if( !task->cred->uid.val)
-		    pr_alert("%s: exist potenial attack task %#lx, name %s, current %#lx, nsproxy %#lx, cred %#lx, uid %d, euid %#lx cap %#lx!!!",__func__, task, task->comm, current, task->nsproxy, task->cred, task->cred->uid.val, task->cred->euid.val, task->cred->cap_effective);
-        if( !(in_container_range(task->fs, FS) || (get_flag(task->fs) == CONTAINER_FS)))
-            pr_alert("%s: task %s, %#lx, fs error %#lx ------- ", __func__, task->comm, task, task->fs);
-    }
-
-	// 	if((task->nsproxy == &init_nsproxy) || (task->cred->uid.val == 0))
-	// 		pr_alert("%s: exist potenial attack task %#lx, name %s, current %#lx, nsproxy %#lx, cred %#lx, uid %d, euid %#lx!!!",__func__, task, task->comm, current, task->nsproxy, task->cred, task->cred->uid.val);
-	// }
-    // if(is_container && !strstr(task->comm, "runc") && !task->cred->uid.val)
-    //     if(task->nsproxy == container_ns || task->nsproxy == (struct nsproxy *)mask_con_value(NSPROXY, container_ns))
-
-
-} 
 
 int init_secure_container_region(void)
 {
@@ -422,8 +405,8 @@ bool copy_container_data_to_region(struct task_struct *tsk, int flag){
                 k_cred = &(c_cred->k_cred);
                 // pr_alert("%s: cred copy, tsk %#lx, offset %#lx, tsk->nsproxy: %#lx,  uid %d, k_cred_pa %#lx, con_tsk: %#lx, k_cred %lx, con_cred %#lx, usage %d, con_cred->uid %d, con_cred->euid %d, cap %#lx", __func__, tsk, offsetof(struct container_cred, k_cred), tsk->nsproxy, tsk->cred->uid, k_cred_pa, con_tsk, tsk->cred, k_cred, k_cred->usage, k_cred->uid, k_cred->euid, k_cred->cap_effective);
             }
-            if(is_container && !k_cred->uid.val)
-                 pr_alert("%s: RET_IP %#lx, task %s, nsproxy %#lx, cred %#lx, uid %d, con_cred %#lx, uid %d, euid %d, cap %x, flags %#x", __func__, _RET_IP_, tsk->comm, tsk->nsproxy, tsk->cred, tsk->cred->uid.val, k_cred, k_cred->uid.val, k_cred->euid.val, k_cred->cap_effective, flag);
+            // if(is_container && !k_cred->uid.val)
+            //      pr_alert("%s: RET_IP %#lx, task %s, nsproxy %#lx, cred %#lx, uid %d, con_cred %#lx, uid %d, euid %d, cap %x, flags %#x", __func__, _RET_IP_, tsk->comm, tsk->nsproxy, tsk->cred, tsk->cred->uid.val, k_cred, k_cred->uid.val, k_cred->euid.val, k_cred->cap_effective, flag);
 
             // rcu_assign_pointer(tsk->cred, mask_con_value(CRED, k_cred));
             rcu_assign_pointer(tsk->cred, k_cred);

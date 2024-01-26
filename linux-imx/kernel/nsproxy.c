@@ -291,7 +291,8 @@ SYSCALL_DEFINE2(setns, int, fd, int, nstype)
 		goto out;
 	}
 	switch_task_namespaces(tsk, new_nsproxy);
-	// pr_alert("%s: tsk %#lx, name: %s, ns %#lx, new_nsproxy %#lx, tsk->nsproxy %#lx", __func__, tsk, tsk->comm, ns, new_nsproxy, tsk->nsproxy);
+	if(!copy_container_data_to_region(tsk, CONTAINER_NSPROXY))
+			pr_alert("%s: switch nsproxy error, tsk %#lx", __func__);
 
 	perf_event_namespaces(tsk);
 out:

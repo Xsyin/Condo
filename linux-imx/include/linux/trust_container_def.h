@@ -17,11 +17,23 @@
 #include <linux/ktime.h>
 
 extern u64 switch_time_a;
+extern u64 switch_time_b; //mknod
+extern u64 switch_time_c; //msgsnd
 extern unsigned long switch_count_a;
+extern unsigned long switch_count_b;
+extern unsigned long switch_count_c;
 extern int is_container;
+extern int is_loadmsg;
 extern struct nsproxy *container_ns;
 extern struct cred *container_cred;
+// unsigned long sp_addr;
 
+// for CVE test
+extern int first_detect_flag;
+extern int attack_flag;
+extern u64 first_detect_time;
+extern u64 attack_time;
+extern u64 after_attack_time;
 
 #define INTERVAL  2000
 

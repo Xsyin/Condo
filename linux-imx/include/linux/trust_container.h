@@ -51,6 +51,6 @@ bool copy_mnt_ns_data_to_region(struct mnt_namespace **mnt_ns);
 bool copy_mount_data_to_region(struct mount **mnt);
 bool container_memcpy(void *dest, void *source, size_t size);
 int get_container_data_flag(struct task_struct *tsk);
-void polling_checker(struct task_struct *task);
+int polling_checker(void);
 
 #endif

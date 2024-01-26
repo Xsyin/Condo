@@ -1,0 +1,286 @@
+struct task_struct {
+	struct thread_info         thread_info;          /*     0    24 */
+
+	/* XXX last struct has 4 bytes of padding */
+
+	volatile long int          state;                /*    24     8 */
+	void *                     stack;                /*    32     8 */
+	atomic_t                   usage;                /*    40     4 */
+	unsigned int               flags;                /*    44     4 */
+	unsigned int               ptrace;               /*    48     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	struct llist_node          wake_entry;           /*    56     8 */
+	/* --- cacheline 1 boundary (64 bytes) --- */
+	int                        on_cpu;               /*    64     4 */
+	unsigned int               cpu;                  /*    68     4 */
+	unsigned int               wakee_flips;          /*    72     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	long unsigned int          wakee_flip_decay_ts;  /*    80     8 */
+	struct task_struct *       last_wakee;           /*    88     8 */
+	int                        recent_used_cpu;      /*    96     4 */
+	int                        wake_cpu;             /*   100     4 */
+	int                        on_rq;                /*   104     4 */
+	int                        prio;                 /*   108     4 */
+	int                        static_prio;          /*   112     4 */
+	int                        normal_prio;          /*   116     4 */
+	unsigned int               rt_priority;          /*   120     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	/* --- cacheline 2 boundary (128 bytes) --- */
+	const struct sched_class  * sched_class;         /*   128     8 */
+
+	/* XXX 56 bytes hole, try to pack */
+
+	/* --- cacheline 3 boundary (192 bytes) --- */
+	struct sched_entity        se __attribute__((__aligned__(64))); /*   192   256 */
+	/* --- cacheline 7 boundary (448 bytes) --- */
+	struct sched_rt_entity     rt;                   /*   448    72 */
+	/* --- cacheline 8 boundary (512 bytes) was 8 bytes ago --- */
+	struct task_group *        sched_task_group;     /*   520     8 */
+	struct sched_dl_entity     dl __attribute__((__aligned__(8))); /*   528   216 */
+	/* --- cacheline 11 boundary (704 bytes) was 40 bytes ago --- */
+	struct hlist_head          preempt_notifiers;    /*   744     8 */
+	unsigned int               policy;               /*   752     4 */
+	int                        nr_cpus_allowed;      /*   756     4 */
+	cpumask_t                  cpus_allowed;         /*   760     8 */
+	/* --- cacheline 12 boundary (768 bytes) --- */
+	int                        rcu_read_lock_nesting; /*   768     4 */
+	union rcu_special          rcu_read_unlock_special; /*   772     4 */
+	struct list_head           rcu_node_entry;       /*   776    16 */
+	struct rcu_node *          rcu_blocked_node;     /*   792     8 */
+	long unsigned int          rcu_tasks_nvcsw;      /*   800     8 */
+	u8                         rcu_tasks_holdout;    /*   808     1 */
+	u8                         rcu_tasks_idx;        /*   809     1 */
+
+	/* XXX 2 bytes hole, try to pack */
+
+	int                        rcu_tasks_idle_cpu;   /*   812     4 */
+	struct list_head           rcu_tasks_holdout_list; /*   816    16 */
+	/* --- cacheline 13 boundary (832 bytes) --- */
+	struct sched_info          sched_info;           /*   832    32 */
+	struct list_head           tasks;                /*   864    16 */
+	struct plist_node          pushable_tasks;       /*   880    40 */
+	/* --- cacheline 14 boundary (896 bytes) was 24 bytes ago --- */
+	struct rb_node             pushable_dl_tasks __attribute__((__aligned__(8))); /*   920    24 */
+	struct mm_struct *         mm;                   /*   944     8 */
+	struct mm_struct *         active_mm;            /*   952     8 */
+	/* --- cacheline 15 boundary (960 bytes) --- */
+	struct vmacache            vmacache;             /*   960    40 */
+	struct task_rss_stat       rss_stat;             /*  1000    20 */
+	int                        exit_state;           /*  1020     4 */
+	/* --- cacheline 16 boundary (1024 bytes) --- */
+	int                        exit_code;            /*  1024     4 */
+	int                        exit_signal;          /*  1028     4 */
+	int                        pdeath_signal;        /*  1032     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	long unsigned int          jobctl;               /*  1040     8 */
+	unsigned int               personality;          /*  1048     4 */
+	unsigned int               sched_reset_on_fork:1; /*  1052: 0  4 */
+	unsigned int               sched_contributes_to_load:1; /*  1052: 1  4 */
+	unsigned int               sched_migrated:1;     /*  1052: 2  4 */
+	unsigned int               sched_remote_wakeup:1; /*  1052: 3  4 */
+
+	/* XXX 28 bits hole, try to pack */
+
+	/* Force alignment to the next boundary: */
+	unsigned int               :0;
+
+	unsigned int               in_execve:1;          /*  1056: 0  4 */
+	unsigned int               in_iowait:1;          /*  1056: 1  4 */
+	unsigned int               in_user_fault:1;      /*  1056: 2  4 */
+	unsigned int               memcg_kmem_skip_account:1; /*  1056: 3  4 */
+	unsigned int               no_cgroup_migration:1; /*  1056: 4  4 */
+	unsigned int               use_memdelay:1;       /*  1056: 5  4 */
+
+	/* XXX 26 bits hole, try to pack */
+	/* XXX 4 bytes hole, try to pack */
+
+	long unsigned int          atomic_flags;         /*  1064     8 */
+	struct restart_block       restart_block;        /*  1072    48 */
+	/* --- cacheline 17 boundary (1088 bytes) was 32 bytes ago --- */
+	pid_t                      pid;                  /*  1120     4 */
+	pid_t                      tgid;                 /*  1124     4 */
+	long unsigned int          stack_canary;         /*  1128     8 */
+	struct task_struct *       real_parent;          /*  1136     8 */
+	struct task_struct *       parent;               /*  1144     8 */
+	/* --- cacheline 18 boundary (1152 bytes) --- */
+	struct list_head           children;             /*  1152    16 */
+	struct list_head           sibling;              /*  1168    16 */
+	struct task_struct *       group_leader;         /*  1184     8 */
+	struct list_head           ptraced;              /*  1192    16 */
+	struct list_head           ptrace_entry;         /*  1208    16 */
+	/* --- cacheline 19 boundary (1216 bytes) was 8 bytes ago --- */
+	struct pid *               thread_pid;           /*  1224     8 */
+	struct hlist_node          pid_links[4];         /*  1232    64 */
+	/* --- cacheline 20 boundary (1280 bytes) was 16 bytes ago --- */
+	struct list_head           thread_group;         /*  1296    16 */
+	struct list_head           thread_node;          /*  1312    16 */
+	struct completion *        vfork_done;           /*  1328     8 */
+	int *                      set_child_tid;        /*  1336     8 */
+	/* --- cacheline 21 boundary (1344 bytes) --- */
+	int *                      clear_child_tid;      /*  1344     8 */
+	u64                        utime;                /*  1352     8 */
+	u64                        stime;                /*  1360     8 */
+	u64                        gtime;                /*  1368     8 */
+	struct prev_cputime        prev_cputime;         /*  1376    24 */
+
+	/* XXX last struct has 4 bytes of padding */
+
+	long unsigned int          nvcsw;                /*  1400     8 */
+	/* --- cacheline 22 boundary (1408 bytes) --- */
+	long unsigned int          nivcsw;               /*  1408     8 */
+	u64                        start_time;           /*  1416     8 */
+	u64                        real_start_time;      /*  1424     8 */
+	long unsigned int          min_flt;              /*  1432     8 */
+	long unsigned int          maj_flt;              /*  1440     8 */
+	struct task_cputime        cputime_expires;      /*  1448    24 */
+	/* --- cacheline 23 boundary (1472 bytes) --- */
+	struct list_head           cpu_timers[3];        /*  1472    48 */
+	const struct cred  *       ptracer_cred;         /*  1520     8 */
+	const struct cred  *       real_cred;            /*  1528     8 */
+	/* --- cacheline 24 boundary (1536 bytes) --- */
+	const struct cred  *       cred;                 /*  1536     8 */
+	char                       comm[16];             /*  1544    16 */
+	struct nameidata *         nameidata;            /*  1560     8 */
+	struct sysv_sem            sysvsem;              /*  1568     8 */
+	struct sysv_shm            sysvshm;              /*  1576    16 */
+	struct fs_struct *         fs;                   /*  1592     8 */
+	/* --- cacheline 25 boundary (1600 bytes) --- */
+	struct files_struct *      files;                /*  1600     8 */
+	struct nsproxy *           nsproxy;              /*  1608     8 */
+	struct signal_struct *     signal;               /*  1616     8 */
+	struct sighand_struct *    sighand;              /*  1624     8 */
+	sigset_t                   blocked;              /*  1632     8 */
+	sigset_t                   real_blocked;         /*  1640     8 */
+	sigset_t                   saved_sigmask;        /*  1648     8 */
+	struct sigpending          pending;              /*  1656    24 */
+	/* --- cacheline 26 boundary (1664 bytes) was 16 bytes ago --- */
+	long unsigned int          sas_ss_sp;            /*  1680     8 */
+	size_t                     sas_ss_size;          /*  1688     8 */
+	unsigned int               sas_ss_flags;         /*  1696     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	struct callback_head *     task_works;           /*  1704     8 */
+	struct audit_context *     audit_context;        /*  1712     8 */
+	kuid_t                     loginuid;             /*  1720     4 */
+	unsigned int               sessionid;            /*  1724     4 */
+	/* --- cacheline 27 boundary (1728 bytes) --- */
+	struct seccomp             seccomp;              /*  1728    16 */
+	u32                        parent_exec_id;       /*  1744     4 */
+	u32                        self_exec_id;         /*  1748     4 */
+	spinlock_t                 alloc_lock;           /*  1752     4 */
+	raw_spinlock_t             pi_lock;              /*  1756     4 */
+	struct wake_q_node         wake_q;               /*  1760     8 */
+	struct rb_root_cached      pi_waiters;           /*  1768    16 */
+	struct task_struct *       pi_top_task;          /*  1784     8 */
+	/* --- cacheline 28 boundary (1792 bytes) --- */
+	struct rt_mutex_waiter *   pi_blocked_on;        /*  1792     8 */
+	void *                     journal_info;         /*  1800     8 */
+	struct bio_list *          bio_list;             /*  1808     8 */
+	struct blk_plug *          plug;                 /*  1816     8 */
+	struct reclaim_state *     reclaim_state;        /*  1824     8 */
+	struct backing_dev_info *  backing_dev_info;     /*  1832     8 */
+	struct io_context *        io_context;           /*  1840     8 */
+	long unsigned int          ptrace_message;       /*  1848     8 */
+	/* --- cacheline 29 boundary (1856 bytes) --- */
+	siginfo_t *                last_siginfo;         /*  1856     8 */
+	struct task_io_accounting  ioac;                 /*  1864    56 */
+	/* --- cacheline 30 boundary (1920 bytes) --- */
+	u64                        acct_rss_mem1;        /*  1920     8 */
+	u64                        acct_vm_mem1;         /*  1928     8 */
+	u64                        acct_timexpd;         /*  1936     8 */
+	nodemask_t                 mems_allowed;         /*  1944     8 */
+	seqcount_t                 mems_allowed_seq;     /*  1952     4 */
+	int                        cpuset_mem_spread_rotor; /*  1956     4 */
+	int                        cpuset_slab_spread_rotor; /*  1960     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	struct css_set *           cgroups;              /*  1968     8 */
+	struct list_head           cg_list;              /*  1976    16 */
+	/* --- cacheline 31 boundary (1984 bytes) was 8 bytes ago --- */
+	struct robust_list_head *  robust_list;          /*  1992     8 */
+	struct compat_robust_list_head * compat_robust_list; /*  2000     8 */
+	struct list_head           pi_state_list;        /*  2008    16 */
+	struct futex_pi_state *    pi_state_cache;       /*  2024     8 */
+	struct perf_event_context * perf_event_ctxp[2];  /*  2032    16 */
+	/* --- cacheline 32 boundary (2048 bytes) --- */
+	struct mutex               perf_event_mutex;     /*  2048    32 */
+	struct list_head           perf_event_list;      /*  2080    16 */
+	struct mempolicy *         mempolicy;            /*  2096     8 */
+	short int                  il_prev;              /*  2104     2 */
+	short int                  pref_node_fork;       /*  2106     2 */
+	int                        numa_scan_seq;        /*  2108     4 */
+	/* --- cacheline 33 boundary (2112 bytes) --- */
+	unsigned int               numa_scan_period;     /*  2112     4 */
+	unsigned int               numa_scan_period_max; /*  2116     4 */
+	int                        numa_preferred_nid;   /*  2120     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	long unsigned int          numa_migrate_retry;   /*  2128     8 */
+	u64                        node_stamp;           /*  2136     8 */
+	u64                        last_task_numa_placement; /*  2144     8 */
+	u64                        last_sum_exec_runtime; /*  2152     8 */
+	struct callback_head       numa_work __attribute__((__aligned__(8))); /*  2160    16 */
+	/* --- cacheline 34 boundary (2176 bytes) --- */
+	struct numa_group *        numa_group;           /*  2176     8 */
+	long unsigned int *        numa_faults;          /*  2184     8 */
+	long unsigned int          total_numa_faults;    /*  2192     8 */
+	long unsigned int          numa_faults_locality[3]; /*  2200    24 */
+	long unsigned int          numa_pages_migrated;  /*  2224     8 */
+	struct rseq *              rseq;                 /*  2232     8 */
+	/* --- cacheline 35 boundary (2240 bytes) --- */
+	u32                        rseq_len;             /*  2240     4 */
+	u32                        rseq_sig;             /*  2244     4 */
+	long unsigned int          rseq_event_mask;      /*  2248     8 */
+	struct tlbflush_unmap_batch tlb_ubc;             /*  2256     0 */
+	struct callback_head       rcu __attribute__((__aligned__(8))); /*  2256    16 */
+	struct pipe_inode_info *   splice_pipe;          /*  2272     8 */
+	struct page_frag           task_frag;            /*  2280    16 */
+	struct task_delay_info *   delays;               /*  2296     8 */
+	/* --- cacheline 36 boundary (2304 bytes) --- */
+	int                        nr_dirtied;           /*  2304     4 */
+	int                        nr_dirtied_pause;     /*  2308     4 */
+	long unsigned int          dirty_paused_when;    /*  2312     8 */
+	u64                        timer_slack_ns;       /*  2320     8 */
+	u64                        default_timer_slack_ns; /*  2328     8 */
+	struct mem_cgroup *        memcg_in_oom;         /*  2336     8 */
+	gfp_t                      memcg_oom_gfp_mask;   /*  2344     4 */
+	int                        memcg_oom_order;      /*  2348     4 */
+	unsigned int               memcg_nr_pages_over_high; /*  2352     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	struct mem_cgroup *        active_memcg;         /*  2360     8 */
+	/* --- cacheline 37 boundary (2368 bytes) --- */
+	struct request_queue *     throttle_queue;       /*  2368     8 */
+	int                        pagefault_disabled;   /*  2376     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	struct task_struct *       oom_reaper_list;      /*  2384     8 */
+	struct vm_struct *         stack_vm_area;        /*  2392     8 */
+	atomic_t                   stack_refcount;       /*  2400     4 */
+
+	/* XXX 4 bytes hole, try to pack */
+
+	void *                     security;             /*  2408     8 */
+	struct thread_struct       thread;               /*  2416   976 */
+
+	/* XXX last struct has 8 bytes of padding */
+
+	/* size: 3392, cachelines: 53, members: 192 */
+	/* sum members: 3282, holes: 13, sum holes: 102 */
+	/* sum bitfield members: 10 bits, bit holes: 2, sum bit holes: 54 bits */
+	/* paddings: 3, sum paddings: 16 */
+	/* forced alignments: 5, forced holes: 1, sum forced holes: 56 */
+} __attribute__((__aligned__(64)));

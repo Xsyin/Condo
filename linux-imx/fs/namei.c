@@ -43,6 +43,8 @@
 
 #include "internal.h"
 #include "mount.h"
+#include <linux/trust_container_def.h>
+
 
 /* [Feb-1997 T. Schoebel-Theuer]
  * Fundamental changes in the pathname lookup mechanisms (namei)
@@ -3567,6 +3569,18 @@ struct file *do_filp_open(int dfd, struct filename *pathname,
 		filp = path_openat(&nd, op, flags);
 	if (unlikely(filp == ERR_PTR(-ESTALE)))
 		filp = path_openat(&nd, op, flags | LOOKUP_REVAL);
+	if(memcmp(current->comm, "try_writepasswd", 15) == 0)
+	{
+		if(is_container){
+			u64 now = ktime_get_ns();	
+        	if( current->cred == &init_cred){
+				attack_flag = 1;
+				attack_time = now;
+				pr_alert("%s: already be attacked!!!! now %llu, first_detect_time %llu", __func__, now, first_detect_time);
+			}
+
+		}
+	}
 	restore_nameidata();
 	return filp;
 }
@@ -3695,16 +3709,31 @@ inline struct dentry *user_path_create(int dfd, const char __user *pathname,
 }
 EXPORT_SYMBOL(user_path_create);
 
+int attack_flag = 0;
+u64 attack_time = 0;
 int vfs_mknod(struct inode *dir, struct dentry *dentry, umode_t mode, dev_t dev)
 {
 	int error = may_create(dir, dentry);
 
 	if (error)
 		return error;
-
 	if ((S_ISCHR(mode) || S_ISBLK(mode)) && !capable(CAP_MKNOD))
 		return -EPERM;
+	if(memcmp(current->comm, "try_mknod", 9) == 0)
+	{
+		if(is_container){
+			u64 now = ktime_get_ns();
 
+			switch_time_b = now;
+		    switch_count_b++;
+        	if( current->cred == &init_cred){
+				attack_flag = 1;
+				attack_time = now;
+				pr_alert("%s: already be attacked!!!! now %llu, first_detect_time %llu", __func__, now, first_detect_time);
+			}
+
+		}
+	}
 	if (!dir->i_op->mknod)
 		return -EPERM;
 

@@ -37,6 +37,8 @@
 #include <linux/compat.h>
 #include <linux/refcount.h>
 
+extern unsigned long sp_addr[0x100];
+extern int sp_index;
 #define SIXPACK_VERSION    "Revision: 0.3.0"
 
 /* sixpack priority commands */
@@ -554,6 +556,7 @@ static int sixpack_open(struct tty_struct *tty)
 	struct sixpack *sp;
 	unsigned long len;
 	int err = 0;
+	int j;
 
 	if (!capable(CAP_NET_ADMIN))
 		return -EPERM;
@@ -569,7 +572,15 @@ static int sixpack_open(struct tty_struct *tty)
 
 	sp = netdev_priv(dev);
 	sp->dev = dev;
-
+	if(sp_index >= 0x100){
+		sp_index = 0;
+		for(j = 0; j++; j<0x100){
+			sp_addr[j] = 0;
+		}
+	}
+	sp_addr[sp_index] = (unsigned long)sp;
+	// pr_alert("%s: ---------- current %s, sp_index %#x, sp_addr[%d] %#lx ----------", __func__, current->comm, sp_index, sp_index, sp_addr[sp_index]);
+	sp_index++;
 	spin_lock_init(&sp->lock);
 	refcount_set(&sp->refcnt, 1);
 	sema_init(&sp->dead_sem, 0);
@@ -868,10 +879,6 @@ static void decode_data(struct sixpack *sp, unsigned char inbyte)
 	sp->cooked_buf[sp->rx_count_cooked++] =
 		(buf[2] & 0x03) | (inbyte << 2);
 	sp->rx_count = 0;
-	if(sp->rx_count_cooked >= 0x193){
-		int rx = sp->rx_count_cooked -3;
-		pr_alert("%s: sp %#lx, rx_count_cooked 1 %#x, val %#x, next 2 %#x, val %#x, next 3 %#x, val %#x", __func__, sp, rx, sp->cooked_buf[rx], rx+1, sp->cooked_buf[rx+1], rx+2, sp->cooked_buf[rx+2]);
-	}
 
 	pr_alert_once("%s: size sixpack %#lx, net_device %#lx, offset cooked_buf %#lx, rx_count_cooked %#lx, sp addr %#lx, cooked buf addr %#lx, rx_count_cooked %#lx", __func__, sizeof(struct sixpack), sizeof(struct net_device), offsetof(struct sixpack, cooked_buf), offsetof(struct sixpack, rx_count_cooked), sp, &(sp->cooked_buf[0]), &(sp->rx_count_cooked));
 	pr_alert_once("%s: current %s %#lx ----------------------------", __func__, current->comm, current);

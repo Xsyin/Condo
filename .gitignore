@@ -9,8 +9,8 @@ cscope.*
 *.log
 *.vscode-ctags
 
-/toolchains
-/out/ubuntu-imx.wic
+toolchains
+out/ubuntu-imx.wic
 
 # Ignore build directory
 build/

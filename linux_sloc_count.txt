@@ -1,0 +1,100 @@
+Have a non-directory at the top, so creating directory top_dir
+Adding /home/wj/data/imx8mqevk_3/linux-imx/COPYING to top_dir
+Adding /home/wj/data/imx8mqevk_3/linux-imx/CREDITS to top_dir
+Creating filelist for Documentation
+Adding /home/wj/data/imx8mqevk_3/linux-imx/Kbuild to top_dir
+Adding /home/wj/data/imx8mqevk_3/linux-imx/Kconfig to top_dir
+Creating filelist for LICENSES
+Adding /home/wj/data/imx8mqevk_3/linux-imx/MAINTAINERS to top_dir
+Adding /home/wj/data/imx8mqevk_3/linux-imx/Makefile to top_dir
+Adding /home/wj/data/imx8mqevk_3/linux-imx/README to top_dir
+Creating filelist for arch
+Creating filelist for block
+Creating filelist for certs
+Creating filelist for crypto
+Creating filelist for drivers
+Creating filelist for firmware
+Creating filelist for fs
+Creating filelist for include
+Creating filelist for init
+Creating filelist for ipc
+Creating filelist for kernel
+Creating filelist for lib
+Creating filelist for mm
+Creating filelist for net
+Creating filelist for samples
+Creating filelist for scripts
+Creating filelist for security
+Creating filelist for sound
+Creating filelist for tools
+Creating filelist for usr
+Creating filelist for virt
+Categorizing files.
+Finding a working MD5 command....
+Found a working MD5 command.
+Warning: in tools, number of duplicates=88
+Computing results.
+
+
+SLOC	Directory	SLOC-by-Language (Sorted)
+11739419 drivers         ansic=11728902,perl=4519,asm=3402,yacc=1688,lex=779,
+                        python=112,sh=17
+1832153 arch            ansic=1555133,asm=273295,perl=1691,sh=1502,awk=482,
+                        python=45,sed=5
+883987  fs              ansic=883987
+840757  sound           ansic=840664,asm=93
+742368  net             ansic=742362,asm=6
+582152  include         ansic=579880,cpp=2242,asm=30
+337789  tools           ansic=292504,sh=21974,python=13701,perl=4539,asm=2050,
+                        yacc=1449,awk=682,lex=598,cpp=267,ruby=25
+206394  kernel          ansic=206394
+100564  lib             ansic=100432,perl=119,awk=13
+85510   mm              ansic=85510
+81015   crypto          ansic=81015
+61690   security        ansic=61690
+58126   scripts         ansic=32012,perl=15247,sh=3470,cpp=2503,python=2095,
+                        yacc=1511,lex=1208,awk=80
+38489   block           ansic=38489
+26314   samples         ansic=24327,sh=1987
+16688   virt            ansic=16688
+6527    ipc             ansic=6527
+4675    Documentation   python=1929,perl=1229,sh=1012,asm=214,ansic=163,
+                        awk=128
+2905    init            ansic=2905
+824     usr             ansic=544,sh=266,asm=14
+337     certs           ansic=307,asm=30
+0       LICENSES        (none)
+0       firmware        (none)
+0       top_dir         (none)
+
+
+Totals grouped by language (dominant language first):
+ansic:     17280435 (97.91%)
+asm:         279134 (1.58%)
+sh:           30228 (0.17%)
+perl:         27344 (0.15%)
+python:       17882 (0.10%)
+cpp:           5012 (0.03%)
+yacc:          4648 (0.03%)
+lex:           2585 (0.01%)
+awk:           1385 (0.01%)
+ruby:            25 (0.00%)
+sed:              5 (0.00%)
+
+
+
+
+Total Physical Source Lines of Code (SLOC)                = 17,648,683
+Development Effort Estimate, Person-Years (Person-Months) = 5,755.43 (69,065.18)
+ (Basic COCOMO model, Person-Months = 2.4 * (KSLOC**1.05))
+Schedule Estimate, Years (Months)                         = 14.38 (172.53)
+ (Basic COCOMO model, Months = 2.5 * (person-months**0.38))
+Estimated Average Number of Developers (Effort/Schedule)  = 400.31
+Total Estimated Cost to Develop                           = $ 777,480,565
+ (average salary = $56,286/year, overhead = 2.40).
+SLOCCount, Copyright (C) 2001-2004 David A. Wheeler
+SLOCCount is Open Source Software/Free Software, licensed under the GNU GPL.
+SLOCCount comes with ABSOLUTELY NO WARRANTY, and you are welcome to
+redistribute it under certain conditions as specified by the GNU GPL license;
+see the documentation for details.
+Please credit this data as "generated using David A. Wheeler's 'SLOCCount'."
